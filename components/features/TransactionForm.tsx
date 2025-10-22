@@ -14,7 +14,7 @@ interface TransactionFormProps {
   onSuccess: () => void;
 }
 
-const incomeCategories = ['급여', '프리랜서 수입', '투자 수익', '기타'];
+const incomeCategories = ['타이탄', '아일라', '투자수익', '기타수익'];
 const expenseCategories = ['식비', '교통비', '주거비', '쇼핑', '의료비', '교육비', '기타'];
 
 export default function TransactionForm({ transaction, onClose, onSuccess }: TransactionFormProps) {
@@ -79,7 +79,7 @@ export default function TransactionForm({ transaction, onClose, onSuccess }: Tra
             setFormData({ 
               ...formData, 
               type: newType,
-              category: newType === 'income' ? '급여' : '식비'
+              category: newType === 'income' ? '타이탄' : '식비'
             });
           }}
           options={[
@@ -115,12 +115,13 @@ export default function TransactionForm({ transaction, onClose, onSuccess }: Tra
 
         <Select
           label="결제 수단"
-          value={formData.payment_method || '카드'}
+          value={formData.payment_method || '현금'}
           onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
           options={[
-            { value: '계좌', label: '계좌' },
-            { value: '카드', label: '카드' },
             { value: '현금', label: '현금' },
+            { value: 'USDT', label: 'USDT' },
+            { value: '계좌이체', label: '계좌이체' },
+            { value: '카드', label: '카드' },
           ]}
         />
 
