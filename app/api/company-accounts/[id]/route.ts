@@ -5,11 +5,12 @@ import type { CompanyAccount, UpdateCompanyAccountInput } from '@/types';
 // GET - 특정 계좌 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const account = db.prepare('SELECT * FROM company_accounts WHERE id = ?')
-      .get(params.id) as CompanyAccount | undefined;
+      .get(id) as CompanyAccount | undefined;
 
     if (!account) {
       return NextResponse.json({ error: 'Account not found' }, { status: 404 });
@@ -25,9 +26,10 @@ export async function GET(
 // PUT - 계좌 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body: UpdateCompanyAccountInput = await request.json();
     const updates: string[] = [];
     const values: any[] = [];
@@ -86,7 +88,7 @@ export async function PUT(
     }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
-    values.push(params.id);
+    values.push(id);
 
     db.prepare(`
       UPDATE company_accounts 
@@ -95,7 +97,7 @@ export async function PUT(
     `).run(...values);
 
     const updatedAccount = db.prepare('SELECT * FROM company_accounts WHERE id = ?')
-      .get(params.id) as CompanyAccount;
+      .get(id) as CompanyAccount;
 
     return NextResponse.json(updatedAccount);
   } catch (error) {
@@ -107,10 +109,11 @@ export async function PUT(
 // DELETE - 계좌 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    db.prepare('DELETE FROM company_accounts WHERE id = ?').run(params.id);
+    const { id } = await params;
+    db.prepare('DELETE FROM company_accounts WHERE id = ?').run(id);
     return NextResponse.json({ message: 'Account deleted successfully' });
   } catch (error) {
     console.error('Error deleting company account:', error);

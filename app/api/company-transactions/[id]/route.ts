@@ -5,11 +5,12 @@ import type { CompanyTransaction, UpdateCompanyTransactionInput } from '@/types'
 // GET - 특정 거래 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const transaction = db.prepare('SELECT * FROM company_transactions WHERE id = ?')
-      .get(params.id) as CompanyTransaction | undefined;
+      .get(id) as CompanyTransaction | undefined;
 
     if (!transaction) {
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
@@ -25,14 +26,15 @@ export async function GET(
 // PUT - 거래 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body: UpdateCompanyTransactionInput = await request.json();
     
     // 기존 거래 정보 조회
     const oldTransaction = db.prepare('SELECT * FROM company_transactions WHERE id = ?')
-      .get(params.id) as CompanyTransaction;
+      .get(id) as CompanyTransaction;
 
     if (!oldTransaction) {
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
@@ -87,7 +89,7 @@ export async function PUT(
     }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
-    values.push(params.id);
+    values.push(id);
 
     // 이전 거래 계좌 잔액 복원
     const oldAccount = db.prepare('SELECT balance FROM company_accounts WHERE id = ?')
@@ -111,7 +113,7 @@ export async function PUT(
     `).run(...values);
 
     const updatedTransaction = db.prepare('SELECT * FROM company_transactions WHERE id = ?')
-      .get(params.id) as CompanyTransaction;
+      .get(id) as CompanyTransaction;
 
     // 새 계좌 잔액 업데이트
     const newAccount = db.prepare('SELECT balance FROM company_accounts WHERE id = ?')
@@ -137,11 +139,12 @@ export async function PUT(
 // DELETE - 거래 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const transaction = db.prepare('SELECT * FROM company_transactions WHERE id = ?')
-      .get(params.id) as CompanyTransaction;
+      .get(id) as CompanyTransaction;
 
     if (!transaction) {
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
@@ -161,7 +164,7 @@ export async function DELETE(
     db.prepare('UPDATE company_accounts SET balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
       .run(newBalance, transaction.account_id);
 
-    db.prepare('DELETE FROM company_transactions WHERE id = ?').run(params.id);
+    db.prepare('DELETE FROM company_transactions WHERE id = ?').run(id);
     return NextResponse.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
     console.error('Error deleting company transaction:', error);
