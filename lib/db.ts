@@ -18,6 +18,7 @@ function initDB() {
       status TEXT CHECK(status IN ('todo', 'in_progress', 'completed')) DEFAULT 'todo',
       project_id INTEGER,
       reference_links TEXT,
+      attached_files TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL
@@ -27,6 +28,13 @@ function initDB() {
   // 기존 테이블에 reference_links 컬럼 추가 (이미 존재하는 경우 무시)
   try {
     db.exec(`ALTER TABLE tasks ADD COLUMN reference_links TEXT`);
+  } catch (error) {
+    // 컬럼이 이미 존재하는 경우 무시
+  }
+
+  // 기존 테이블에 attached_files 컬럼 추가 (이미 존재하는 경우 무시)
+  try {
+    db.exec(`ALTER TABLE tasks ADD COLUMN attached_files TEXT`);
   } catch (error) {
     // 컬럼이 이미 존재하는 경우 무시
   }

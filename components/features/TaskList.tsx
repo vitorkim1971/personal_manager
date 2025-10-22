@@ -137,6 +137,28 @@ export default function TaskList({ tasks, projects = [], onEdit, onDelete, onTog
                   </div>
                 </div>
               )}
+
+              {/* 첨부 파일 */}
+              {task.attached_files && JSON.parse(task.attached_files).length > 0 && (
+                <div className="mt-3">
+                  <div className="text-xs text-gray-500 mb-1">첨부 파일:</div>
+                  <div className="text-xs text-gray-600 space-y-1">
+                    {JSON.parse(task.attached_files).map((fileName: string, index: number) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <span>📎 {fileName}</span>
+                        <a
+                          href={`/api/files/download/${fileName}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          다운로드
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </Card>

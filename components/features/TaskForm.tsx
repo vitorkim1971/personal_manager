@@ -15,6 +15,7 @@ interface TaskFormProps {
 
 export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState<CreateTaskInput>({
     title: '',
     description: '',
@@ -24,6 +25,7 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
     status: 'todo',
     project_id: undefined,
     reference_links: '',
+    attached_files: '',
   });
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
         status: task.status,
         project_id: task.project_id,
         reference_links: task.reference_links || '',
+        attached_files: task.attached_files || '',
       });
     }
   }, [task]);
@@ -53,6 +56,44 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
     } catch (error) {
       console.error('Error fetching projects:', error);
     }
+  };
+
+  const handleFileUpload = async (files: FileList) => {
+    const fileArray = Array.from(files);
+    const uploadedFileNames: string[] = [];
+
+    for (const file of fileArray) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/api/files', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          uploadedFileNames.push(result.filename);
+        } else {
+          console.error('File upload failed:', file.name);
+        }
+      } catch (error) {
+        console.error('Error uploading file:', file.name, error);
+      }
+    }
+
+    if (uploadedFileNames.length > 0) {
+      const currentFiles = formData.attached_files ? JSON.parse(formData.attached_files) : [];
+      const newFiles = [...currentFiles, ...uploadedFileNames];
+      setFormData({ ...formData, attached_files: JSON.stringify(newFiles) });
+    }
+  };
+
+  const handleFileRemove = (fileName: string) => {
+    const currentFiles = formData.attached_files ? JSON.parse(formData.attached_files) : [];
+    const newFiles = currentFiles.filter((file: string) => file !== fileName);
+    setFormData({ ...formData, attached_files: JSON.stringify(newFiles) });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -161,6 +202,49 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
             onChange={(e) => setFormData({ ...formData, reference_links: e.target.value })}
             placeholder="관련 문서나 참고할 수 있는 내용들의 링크를 입력하세요 (여러 링크는 줄바꿈으로 구분)"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">관련 문서 업로드</label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+            <input
+              type="file"
+              multiple
+              onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+              className="hidden"
+              id="file-upload"
+            />
+            <label
+              htmlFor="file-upload"
+              className="cursor-pointer flex flex-col items-center justify-center py-4"
+            >
+              <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <span className="text-sm text-gray-600">파일을 드래그하거나 클릭하여 업로드</span>
+            </label>
+          </div>
+          
+          {/* 업로드된 파일 목록 */}
+          {formData.attached_files && JSON.parse(formData.attached_files).length > 0 && (
+            <div className="mt-3">
+              <div className="text-sm text-gray-600 mb-2">첨부된 파일:</div>
+              <div className="space-y-2">
+                {JSON.parse(formData.attached_files).map((fileName: string, index: number) => (
+                  <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                    <span className="text-sm text-gray-700">📎 {fileName}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleFileRemove(fileName)}
+                      className="text-red-500 hover:text-red-700 text-sm"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <Select
