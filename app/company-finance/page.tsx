@@ -18,7 +18,8 @@ export default function CompanyFinancePage() {
   const router = useRouter();
   const [accounts, setAccounts] = useState<CompanyAccount[]>([]);
   const [transactions, setTransactions] = useState<CompanyTransaction[]>([]);
-  const [summary, setSummary] = useState<CompanyFinanceSummary | null>(null);
+  const [monthlySummary, setMonthlySummary] = useState<CompanyFinanceSummary | null>(null);
+  const [yearlySummary, setYearlySummary] = useState<CompanyFinanceSummary | null>(null);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
@@ -27,13 +28,15 @@ export default function CompanyFinancePage() {
   const [editingTransaction, setEditingTransaction] = useState<CompanyTransaction | null>(null);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
   useEffect(() => {
     fetchAccounts();
     fetchTransactions();
-    fetchSummary();
+    fetchMonthlySummary();
+    fetchYearlySummary();
     fetchBudgets();
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedYear]);
 
   const fetchAccounts = async () => {
     try {
@@ -60,13 +63,23 @@ export default function CompanyFinancePage() {
     }
   };
 
-  const fetchSummary = async () => {
+  const fetchMonthlySummary = async () => {
     try {
       const response = await fetch(`/api/company-stats?type=monthly&month=${selectedMonth}`);
       const data = await response.json();
-      setSummary(data);
+      setMonthlySummary(data);
     } catch (error) {
-      console.error('Error fetching summary:', error);
+      console.error('Error fetching monthly summary:', error);
+    }
+  };
+
+  const fetchYearlySummary = async () => {
+    try {
+      const response = await fetch(`/api/company-stats?type=yearly&year=${selectedYear}`);
+      const data = await response.json();
+      setYearlySummary(data);
+    } catch (error) {
+      console.error('Error fetching yearly summary:', error);
     }
   };
 
@@ -86,7 +99,8 @@ export default function CompanyFinancePage() {
     try {
       await fetch(`/api/company-accounts/${id}`, { method: 'DELETE' });
       fetchAccounts();
-      fetchSummary();
+      fetchMonthlySummary();
+      fetchYearlySummary();
     } catch (error) {
       console.error('Error deleting account:', error);
     }
@@ -109,7 +123,8 @@ export default function CompanyFinancePage() {
       await fetch(`/api/company-transactions/${id}`, { method: 'DELETE' });
       fetchTransactions();
       fetchAccounts();
-      fetchSummary();
+      fetchMonthlySummary();
+      fetchYearlySummary();
     } catch (error) {
       console.error('Error deleting transaction:', error);
     }
@@ -119,7 +134,8 @@ export default function CompanyFinancePage() {
     setIsAccountModalOpen(false);
     setEditingAccount(null);
     fetchAccounts();
-    fetchSummary();
+    fetchMonthlySummary();
+    fetchYearlySummary();
   };
 
   const handleTransactionFormSuccess = () => {
@@ -127,7 +143,8 @@ export default function CompanyFinancePage() {
     setEditingTransaction(null);
     fetchTransactions();
     fetchAccounts();
-    fetchSummary();
+    fetchMonthlySummary();
+    fetchYearlySummary();
   };
 
   const fetchBudgets = async () => {
@@ -175,12 +192,20 @@ export default function CompanyFinancePage() {
     fetchBudgets();
   };
 
-  const incomeGrowth = summary?.prevMonthIncome
-    ? calculateGrowthRate(summary.totalIncome, summary.prevMonthIncome)
+  const incomeGrowth = monthlySummary?.prevMonthIncome
+    ? calculateGrowthRate(monthlySummary.totalIncome, monthlySummary.prevMonthIncome)
     : 0;
 
-  const expenseGrowth = summary?.prevMonthExpense
-    ? calculateGrowthRate(summary.totalExpense, summary.prevMonthExpense)
+  const expenseGrowth = monthlySummary?.prevMonthExpense
+    ? calculateGrowthRate(monthlySummary.totalExpense, monthlySummary.prevMonthExpense)
+    : 0;
+
+  const yearlyIncomeGrowth = yearlySummary?.prevYearIncome
+    ? calculateGrowthRate(yearlySummary.totalIncome, yearlySummary.prevYearIncome)
+    : 0;
+
+  const yearlyExpenseGrowth = yearlySummary?.prevYearExpense
+    ? calculateGrowthRate(yearlySummary.totalExpense, yearlySummary.prevYearExpense)
     : 0;
 
   const getAccountName = (accountId: number) => {
@@ -196,16 +221,36 @@ export default function CompanyFinancePage() {
   return (
     <MainLayout title="회사 재무관리">
       <div className="space-y-6">
-        {/* 월별 선택 및 액션 버튼 */}
+        {/* 월별/연간 선택 및 액션 버튼 */}
         <Card>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <input
-                type="month"
-                className="px-3 py-2 border border-gray-300 rounded-lg"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-              />
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">월간:</label>
+                <input
+                  type="month"
+                  className="px-3 py-2 border border-gray-300 rounded-lg"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">연간:</label>
+                <select
+                  className="px-3 py-2 border border-gray-300 rounded-lg"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                >
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const year = new Date().getFullYear() - 2 + i;
+                    return (
+                      <option key={year} value={year}>
+                        {year}년
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
               <Button onClick={handleCreateTransaction} variant="primary">
                 + 수입/지출 추가
               </Button>
@@ -216,16 +261,65 @@ export default function CompanyFinancePage() {
           </div>
         </Card>
 
-        {/* 월별 재무 요약 */}
-        {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
+        {/* 연간 재무 요약 */}
+        {yearlySummary && (
+          <Card>
+            <h2 className="text-xl font-bold mb-4">{selectedYear}년 연간 재무 현황</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <div className="text-sm text-gray-500 mb-2">총 수입</div>
+                <div className="text-sm text-gray-500 mb-2">연간 총 수입</div>
                 <div className="text-3xl font-bold text-green-600">
-                  {formatCurrency(summary.totalIncome)}
+                  {formatCurrency(yearlySummary.totalIncome)}
                 </div>
-                {summary.prevMonthIncome !== undefined && (
+                {yearlySummary.prevYearIncome !== undefined && (
+                  <div className="mt-2 text-sm">
+                    전년 대비{' '}
+                    <span className={yearlyIncomeGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      {yearlyIncomeGrowth >= 0 ? '↑' : '↓'} {formatPercentage(Math.abs(yearlyIncomeGrowth))}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="text-sm text-gray-500 mb-2">연간 총 지출</div>
+                <div className="text-3xl font-bold text-red-600">
+                  {formatCurrency(yearlySummary.totalExpense)}
+                </div>
+                {yearlySummary.prevYearExpense !== undefined && (
+                  <div className="mt-2 text-sm">
+                    전년 대비{' '}
+                    <span className={yearlyExpenseGrowth >= 0 ? 'text-red-600' : 'text-green-600'}>
+                      {yearlyExpenseGrowth >= 0 ? '↑' : '↓'} {formatPercentage(Math.abs(yearlyExpenseGrowth))}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="text-sm text-gray-500 mb-2">연간 순손익</div>
+                <div className={`text-3xl font-bold ${yearlySummary.netIncome >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                  {formatCurrency(yearlySummary.netIncome)}
+                </div>
+                <div className="text-sm text-gray-600 mt-2">
+                  수입 - 지출
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* 월별 재무 요약 */}
+        {monthlySummary && (
+          <Card>
+            <h2 className="text-xl font-bold mb-4">{selectedMonth} 월간 재무 현황</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <div className="text-sm text-gray-500 mb-2">월간 총 수입</div>
+                <div className="text-3xl font-bold text-green-600">
+                  {formatCurrency(monthlySummary.totalIncome)}
+                </div>
+                {monthlySummary.prevMonthIncome !== undefined && (
                   <div className="mt-2 text-sm">
                     전월 대비{' '}
                     <span className={incomeGrowth >= 0 ? 'text-green-600' : 'text-red-600'}>
@@ -234,15 +328,13 @@ export default function CompanyFinancePage() {
                   </div>
                 )}
               </div>
-            </Card>
 
-            <Card>
               <div>
-                <div className="text-sm text-gray-500 mb-2">총 지출</div>
+                <div className="text-sm text-gray-500 mb-2">월간 총 지출</div>
                 <div className="text-3xl font-bold text-red-600">
-                  {formatCurrency(summary.totalExpense)}
+                  {formatCurrency(monthlySummary.totalExpense)}
                 </div>
-                {summary.prevMonthExpense !== undefined && (
+                {monthlySummary.prevMonthExpense !== undefined && (
                   <div className="mt-2 text-sm">
                     전월 대비{' '}
                     <span className={expenseGrowth >= 0 ? 'text-red-600' : 'text-green-600'}>
@@ -251,20 +343,18 @@ export default function CompanyFinancePage() {
                   </div>
                 )}
               </div>
-            </Card>
 
-            <Card>
               <div>
-                <div className="text-sm text-gray-500 mb-2">순손익</div>
-                <div className={`text-3xl font-bold ${summary.netIncome >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                  {formatCurrency(summary.netIncome)}
+                <div className="text-sm text-gray-500 mb-2">월간 순손익</div>
+                <div className={`text-3xl font-bold ${monthlySummary.netIncome >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                  {formatCurrency(monthlySummary.netIncome)}
                 </div>
                 <div className="text-sm text-gray-600 mt-2">
                   수입 - 지출
                 </div>
               </div>
-            </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
         {/* 최근 거래 내역 */}

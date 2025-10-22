@@ -12,6 +12,8 @@ export async function GET(request: NextRequest) {
       return getTodayStats();
     } else if (type === 'monthly') {
       return getMonthlyStats(request);
+    } else if (type === 'yearly') {
+      return getYearlyStats(request);
     } else if (type === 'trends') {
       return getTrendsData();
     } else if (type === 'categories') {
@@ -148,5 +150,59 @@ function getCategoryStats(request: NextRequest) {
   }));
 
   return NextResponse.json(categoriesWithPercentage);
+}
+
+// 연간 통계 데이터
+function getYearlyStats(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const yearParam = searchParams.get('year');
+  
+  const targetYear = yearParam ? parseInt(yearParam) : new Date().getFullYear();
+  const startDate = `${targetYear}-01-01`;
+  const endDate = `${targetYear}-12-31`;
+
+  // 수입
+  const incomeStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE type = 'income' AND date >= ? AND date <= ?
+  `);
+  const incomeResult = incomeStmt.get(startDate, endDate) as { total: number };
+
+  // 지출
+  const expenseStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE type = 'expense' AND date >= ? AND date <= ?
+  `);
+  const expenseResult = expenseStmt.get(startDate, endDate) as { total: number };
+
+  // 전년 데이터
+  const prevYear = targetYear - 1;
+  const prevStartDate = `${prevYear}-01-01`;
+  const prevEndDate = `${prevYear}-12-31`;
+
+  const prevIncomeStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE type = 'income' AND date >= ? AND date <= ?
+  `);
+  const prevIncomeResult = prevIncomeStmt.get(prevStartDate, prevEndDate) as { total: number };
+
+  const prevExpenseStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE type = 'expense' AND date >= ? AND date <= ?
+  `);
+  const prevExpenseResult = prevExpenseStmt.get(prevStartDate, prevEndDate) as { total: number };
+
+  return NextResponse.json({
+    year: targetYear,
+    totalIncome: incomeResult.total,
+    totalExpense: expenseResult.total,
+    netIncome: incomeResult.total - expenseResult.total,
+    prevYearIncome: prevIncomeResult.total,
+    prevYearExpense: prevExpenseResult.total,
+  });
 }
 

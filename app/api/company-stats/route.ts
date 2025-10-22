@@ -72,6 +72,69 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(summary);
     }
 
+    if (type === 'yearly') {
+      // 연간 요약
+      const year = searchParams.get('year') || new Date().getFullYear().toString();
+      const startDate = `${year}-01-01`;
+      const endDate = `${year}-12-31`;
+
+      // 수입
+      const incomeResult = db.prepare(`
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM company_transactions
+        WHERE type = 'income' AND date >= ? AND date <= ?
+      `).get(startDate, endDate) as { total: number };
+
+      // 지출
+      const expenseResult = db.prepare(`
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM company_transactions
+        WHERE type = 'expense' AND date >= ? AND date <= ?
+      `).get(startDate, endDate) as { total: number };
+
+      // 전년 데이터
+      const prevYear = (parseInt(year) - 1).toString();
+      const prevStartDate = `${prevYear}-01-01`;
+      const prevEndDate = `${prevYear}-12-31`;
+
+      const prevIncomeResult = db.prepare(`
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM company_transactions
+        WHERE type = 'income' AND date >= ? AND date <= ?
+      `).get(prevStartDate, prevEndDate) as { total: number };
+
+      const prevExpenseResult = db.prepare(`
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM company_transactions
+        WHERE type = 'expense' AND date >= ? AND date <= ?
+      `).get(prevStartDate, prevEndDate) as { total: number };
+
+      // 월별 데이터 (차트용)
+      const monthlyData = db.prepare(`
+        SELECT 
+          strftime('%m', date) as month,
+          SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income,
+          SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense
+        FROM company_transactions
+        WHERE date >= ? AND date <= ?
+        GROUP BY strftime('%m', date)
+        ORDER BY month ASC
+      `).all(startDate, endDate) as { month: string; income: number; expense: number }[];
+
+      const summary: CompanyFinanceSummary = {
+        year: year,
+        totalIncome: incomeResult.total,
+        totalExpense: expenseResult.total,
+        netIncome: incomeResult.total - expenseResult.total,
+        accountBalances: [],
+        prevYearIncome: prevIncomeResult.total,
+        prevYearExpense: prevExpenseResult.total,
+        monthlyData,
+      };
+
+      return NextResponse.json(summary);
+    }
+
     if (type === 'categories') {
       // 카테고리별 집계
       const categories = db.prepare(`

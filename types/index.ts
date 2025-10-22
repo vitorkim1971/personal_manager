@@ -326,12 +326,16 @@ export interface UpdateCompanyTransactionInput {
 
 // Company Finance Summary (회사 재무 요약)
 export interface CompanyFinanceSummary {
-  month: string;
+  month?: string;
+  year?: string;
   totalIncome: number;
   totalExpense: number;
   netIncome: number;
   accountBalances: { account_name: string; balance: number }[];
   prevMonthIncome?: number;
   prevMonthExpense?: number;
+  prevYearIncome?: number;
+  prevYearExpense?: number;
+  monthlyData?: { month: string; income: number; expense: number }[];
 }
 

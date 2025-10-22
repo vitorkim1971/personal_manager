@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 export default function FinancePage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [monthlySummary, setMonthlySummary] = useState<MonthlySummaryType | null>(null);
+  const [yearlySummary, setYearlySummary] = useState<any>(null);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
@@ -24,13 +25,16 @@ export default function FinancePage() {
     type?: TransactionType;
     category?: TransactionCategory;
     month?: string;
+    year?: string;
   }>({
     month: format(new Date(), 'yyyy-MM'),
+    year: new Date().getFullYear().toString(),
   });
 
   useEffect(() => {
     fetchTransactions();
     fetchMonthlySummary();
+    fetchYearlySummary();
     fetchBudgets();
   }, [filter]);
 
@@ -64,6 +68,19 @@ export default function FinancePage() {
       setMonthlySummary(data);
     } catch (error) {
       console.error('Error fetching monthly summary:', error);
+    }
+  };
+
+  const fetchYearlySummary = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filter.year) params.append('year', filter.year);
+
+      const response = await fetch(`/api/stats?type=yearly&${params.toString()}`);
+      const data = await response.json();
+      setYearlySummary(data);
+    } catch (error) {
+      console.error('Error fetching yearly summary:', error);
     }
   };
 
