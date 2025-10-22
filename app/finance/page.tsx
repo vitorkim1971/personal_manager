@@ -28,7 +28,7 @@ export default function FinancePage() {
     month?: string;
     year?: string;
   }>({
-    month: format(new Date(), 'yyyy-MM'),
+    month: '', // 기본값을 빈 문자열로 변경하여 전체 거래 내역 표시
     year: new Date().getFullYear().toString(),
   });
 
@@ -186,12 +186,13 @@ export default function FinancePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">월간:</label>
+                <label className="text-sm font-medium text-gray-700">월간 필터:</label>
                 <input
                   type="month"
                   className="px-3 py-2 border border-gray-300 rounded-lg"
                   value={filter.month}
                   onChange={(e) => setFilter({ ...filter, month: e.target.value })}
+                  placeholder="전체 기간"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -225,8 +226,8 @@ export default function FinancePage() {
                 <option value="income">수입</option>
                 <option value="expense">지출</option>
               </select>
-              {(filter.type || filter.category) && (
-                <Button variant="ghost" onClick={() => setFilter({ month: filter.month, year: filter.year })}>
+              {(filter.type || filter.category || filter.month) && (
+                <Button variant="ghost" onClick={() => setFilter({ month: '', year: filter.year })}>
                   필터 초기화
                 </Button>
               )}
@@ -283,7 +284,7 @@ export default function FinancePage() {
         )}
 
         {/* 월별 재무 요약 */}
-        {monthlySummary && (
+        {monthlySummary && filter.month && (
           <Card>
             <h2 className="text-xl font-bold mb-4">{filter.month} 월간 재무 현황</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
