@@ -68,10 +68,10 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="w-[280px] h-screen bg-[#1a1f2e] text-white flex flex-col fixed left-0 top-0">
+    <div className="w-[280px] h-screen bg-gray-50 text-gray-900 flex flex-col fixed left-0 top-0 border-r border-gray-200">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
-        <h1 className="text-xl font-bold">개인 관리 시스템</h1>
+      <div className="p-6 border-b border-gray-200">
+        <h1 className="text-xl font-bold text-gray-900">개인 관리 시스템</h1>
       </div>
 
       {/* Navigation */}
@@ -86,8 +86,8 @@ export default function Sidebar() {
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                 isActive
-                  ? 'bg-[#4a6fa5] text-white font-semibold'
-                  : 'text-white hover:bg-[#2a3441] hover:text-white'
+                  ? 'bg-blue-100 text-blue-900 font-semibold'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               )}
             >
               <Icon />
@@ -98,14 +98,14 @@ export default function Sidebar() {
       </nav>
 
       {/* User Info */}
-      <div className="p-6 border-t border-gray-700">
+      <div className="p-6 border-t border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#4a6fa5] rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
             <UserIcon />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">사용자</p>
-            <p className="text-xs text-gray-300">개인 계정</p>
+            <p className="text-sm font-medium text-gray-900">사용자</p>
+            <p className="text-xs text-gray-600">개인 계정</p>
           </div>
         </div>
       </div>
