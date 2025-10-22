@@ -5,7 +5,7 @@ const dbPath = path.join(process.cwd(), 'personal-manager.db');
 const db = new Database(dbPath);
 
 // 데이터베이스 초기화
-export function initDB() {
+function initDB() {
   // Tasks 테이블 (PRD 7.2.1)
   db.exec(`
     CREATE TABLE IF NOT EXISTS tasks (
