@@ -48,6 +48,10 @@ export async function PUT(
       updates.push('account_type = ?');
       values.push(body.account_type);
     }
+    if (body.account_purpose !== undefined) {
+      updates.push('account_purpose = ?');
+      values.push(body.account_purpose);
+    }
     if (body.currency !== undefined) {
       updates.push('currency = ?');
       values.push(body.currency);

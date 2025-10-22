@@ -19,6 +19,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
     account_number: '',
     bank_name: '',
     account_type: 'crypto',
+    account_purpose: 'both',
     currency: 'USDT',
     balance: 0,
     description: '',
@@ -35,6 +36,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
         account_number: account.account_number,
         bank_name: account.bank_name,
         account_type: account.account_type,
+        account_purpose: account.account_purpose,
         currency: account.currency,
         balance: account.balance,
         description: account.description,
@@ -98,11 +100,19 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
           value={formData.account_type}
           onChange={(e) => setFormData({ ...formData, account_type: e.target.value as any })}
           options={[
-            { value: 'crypto', label: '암호화폐 계좌' },
-            { value: 'checking', label: '당좌예금' },
-            { value: 'savings', label: '보통예금' },
-            { value: 'investment', label: '투자계좌' },
-            { value: 'other', label: '기타' },
+            { value: 'crypto', label: '암호화폐 지갑' },
+            { value: 'bank', label: '은행계좌' },
+          ]}
+        />
+
+        <Select
+          label="계좌 용도"
+          value={formData.account_purpose}
+          onChange={(e) => setFormData({ ...formData, account_purpose: e.target.value as any })}
+          options={[
+            { value: 'both', label: '입출금 겸용' },
+            { value: 'deposit', label: '입금 전용' },
+            { value: 'withdrawal', label: '출금 전용' },
           ]}
         />
 

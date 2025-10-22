@@ -12,11 +12,14 @@ interface CompanyAccountListProps {
 }
 
 const accountTypeLabels: Record<string, string> = {
-  crypto: '암호화폐',
-  checking: '당좌예금',
-  savings: '보통예금',
-  investment: '투자계좌',
-  other: '기타',
+  crypto: '암호화폐 지갑',
+  bank: '은행계좌',
+};
+
+const accountPurposeLabels: Record<string, string> = {
+  both: '입출금 겸용',
+  deposit: '입금 전용',
+  withdrawal: '출금 전용',
 };
 
 export default function CompanyAccountList({ accounts, onEdit, onDelete }: CompanyAccountListProps) {
@@ -36,9 +39,15 @@ export default function CompanyAccountList({ accounts, onEdit, onDelete }: Compa
         <Card key={account.id}>
           <div className="space-y-3">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">{account.account_name}</h3>
-                <p className="text-sm text-gray-500">{accountTypeLabels[account.account_type]}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm text-gray-500">{accountTypeLabels[account.account_type]}</span>
+                  <span className="text-gray-300">•</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                    {accountPurposeLabels[account.account_purpose]}
+                  </span>
+                </div>
               </div>
               <span className={`text-xs px-2 py-1 rounded ${account.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                 {account.is_active ? '활성' : '비활성'}

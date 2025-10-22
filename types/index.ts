@@ -228,7 +228,8 @@ export interface TransactionFilter {
 }
 
 // Company Account (회사 계좌)
-export type AccountType = 'checking' | 'savings' | 'investment' | 'crypto' | 'other';
+export type AccountType = 'crypto' | 'bank';
+export type AccountPurpose = 'deposit' | 'withdrawal' | 'both';
 
 export interface CompanyAccount {
   id: number;
@@ -236,6 +237,7 @@ export interface CompanyAccount {
   account_number?: string;
   bank_name?: string;
   account_type: AccountType;
+  account_purpose: AccountPurpose;
   currency: string;
   balance: number;
   description?: string;
@@ -252,6 +254,7 @@ export interface CreateCompanyAccountInput {
   account_number?: string;
   bank_name?: string;
   account_type?: AccountType;
+  account_purpose?: AccountPurpose;
   currency?: string;
   balance?: number;
   description?: string;
@@ -266,6 +269,7 @@ export interface UpdateCompanyAccountInput {
   account_number?: string;
   bank_name?: string;
   account_type?: AccountType;
+  account_purpose?: AccountPurpose;
   currency?: string;
   balance?: number;
   description?: string;
