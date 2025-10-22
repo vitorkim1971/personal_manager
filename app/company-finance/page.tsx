@@ -300,16 +300,40 @@ export default function CompanyFinancePage() {
       )}
 
       {/* 거래 생성/수정 모달 */}
-      {isTransactionModalOpen && accounts.length > 0 && (
-        <CompanyTransactionForm
-          transaction={editingTransaction}
-          accounts={accounts}
-          onClose={() => {
-            setIsTransactionModalOpen(false);
-            setEditingTransaction(null);
-          }}
-          onSuccess={handleTransactionFormSuccess}
-        />
+      {isTransactionModalOpen && (
+        <>
+          {accounts.length > 0 ? (
+            <CompanyTransactionForm
+              transaction={editingTransaction}
+              accounts={accounts}
+              onClose={() => {
+                setIsTransactionModalOpen(false);
+                setEditingTransaction(null);
+              }}
+              onSuccess={handleTransactionFormSuccess}
+            />
+          ) : (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md">
+                <h3 className="text-lg font-bold mb-4">계좌가 없습니다</h3>
+                <p className="text-gray-600 mb-4">
+                  거래를 추가하려면 먼저 계좌를 생성해야 합니다.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="ghost" onClick={() => setIsTransactionModalOpen(false)}>
+                    취소
+                  </Button>
+                  <Button onClick={() => {
+                    setIsTransactionModalOpen(false);
+                    handleCreateAccount();
+                  }}>
+                    계좌 생성하기
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </MainLayout>
   );

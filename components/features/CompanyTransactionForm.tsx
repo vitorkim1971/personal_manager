@@ -29,8 +29,10 @@ const expenseCategories = [
 ];
 
 export default function CompanyTransactionForm({ transaction, accounts, onClose, onSuccess }: CompanyTransactionFormProps) {
+  const defaultAccountId = accounts.length > 0 ? accounts[0].id : 0;
+  
   const [formData, setFormData] = useState<CreateCompanyTransactionInput>({
-    account_id: accounts[0]?.id || 0,
+    account_id: defaultAccountId,
     type: 'expense',
     amount: 0,
     category: '인건비',
