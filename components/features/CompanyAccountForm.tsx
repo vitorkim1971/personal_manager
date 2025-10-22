@@ -53,6 +53,8 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
       const url = account ? `/api/company-accounts/${account.id}` : '/api/company-accounts';
       const method = account ? 'PUT' : 'POST';
 
+      console.log('Submitting account data:', formData);
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -60,10 +62,17 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log('Account created:', result);
         onSuccess();
+      } else {
+        const error = await response.json();
+        console.error('Error response:', error);
+        alert(`계좌 생성 실패: ${error.error || '알 수 없는 오류'}`);
       }
     } catch (error) {
       console.error('Error saving account:', error);
+      alert('계좌 생성 중 오류가 발생했습니다.');
     }
   };
 
@@ -102,7 +111,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
             <Input
               label="거래소/지갑명"
               type="text"
-              value={formData.exchange_name}
+              value={formData.exchange_name || ''}
               onChange={(e) => setFormData({ ...formData, exchange_name: e.target.value })}
               placeholder="예: Binance, MetaMask, Trust Wallet"
             />
@@ -110,7 +119,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
             <Input
               label="지갑 주소"
               type="text"
-              value={formData.wallet_address}
+              value={formData.wallet_address || ''}
               onChange={(e) => setFormData({ ...formData, wallet_address: e.target.value })}
               placeholder="입출금 주소"
             />
@@ -118,7 +127,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
             <Input
               label="네트워크"
               type="text"
-              value={formData.network}
+              value={formData.network || ''}
               onChange={(e) => setFormData({ ...formData, network: e.target.value })}
               placeholder="예: TRC20, ERC20, BEP20"
             />
@@ -128,14 +137,14 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
             <Input
               label="계좌번호"
               type="text"
-              value={formData.account_number}
+              value={formData.account_number || ''}
               onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
             />
 
             <Input
               label="은행명"
               type="text"
-              value={formData.bank_name}
+              value={formData.bank_name || ''}
               onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
             />
           </>
@@ -162,7 +171,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
           <textarea
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={2}
-            value={formData.description}
+            value={formData.description || ''}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
