@@ -280,7 +280,7 @@ export default function DashboardPage() {
                       return (
                         <div key={budget.id} className="border-b border-gray-100 pb-2 last:border-b-0">
                           <div className="flex items-center justify-between mb-1">
-                            <div className="text-sm font-medium">{budget.category}</div>
+                            <div className="text-sm font-medium">{budget.category || budget.description || '기타'}</div>
                             <div className="text-xs text-gray-600">
                               {formatCurrency(budget.spent_amount)} / {formatCurrency(budget.budgeted_amount)}
                             </div>
@@ -347,7 +347,7 @@ export default function DashboardPage() {
                       return (
                         <div key={budget.id} className="border-b border-gray-100 pb-2 last:border-b-0">
                           <div className="flex items-center justify-between mb-1">
-                            <div className="text-sm font-medium">{budget.category}</div>
+                            <div className="text-sm font-medium">{budget.category || budget.description || '기타'}</div>
                             <div className="text-xs text-gray-600">
                               {formatCurrency(budget.spent_amount)} / {formatCurrency(budget.budgeted_amount)}
                             </div>
