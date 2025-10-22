@@ -13,6 +13,19 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+// 마이너스 숫자를 위한 색상 클래스 반환
+export function getAmountColorClass(amount: number, positiveColor: string = 'text-green-600', negativeColor: string = 'text-red-600'): string {
+  return amount >= 0 ? positiveColor : negativeColor;
+}
+
+// 금액과 함께 색상 클래스를 반환하는 함수
+export function formatCurrencyWithColor(amount: number, positiveColor: string = 'text-green-600', negativeColor: string = 'text-red-600'): { formatted: string; colorClass: string } {
+  return {
+    formatted: formatCurrency(amount),
+    colorClass: getAmountColorClass(amount, positiveColor, negativeColor)
+  };
+}
+
 // 날짜 포맷팅 (YYYY-MM-DD)
 export function formatDate(date: string | Date): string {
   const d = new Date(date);

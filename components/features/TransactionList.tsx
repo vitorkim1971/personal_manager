@@ -2,7 +2,7 @@
 
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { formatCurrency, formatDateKorean, getTransactionTypeColor } from '@/lib/utils';
+import { formatCurrency, formatDateKorean, getTransactionTypeColor, getAmountColorClass } from '@/lib/utils';
 import type { Transaction } from '@/types';
 
 interface TransactionListProps {
@@ -65,8 +65,8 @@ export default function TransactionList({ transactions, onEdit, onDelete }: Tran
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {transaction.category}
                 </td>
-                <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${getTransactionTypeColor(transaction.type)}`}>
-                  {formatCurrency(transaction.amount)}
+                <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${getAmountColorClass(transaction.type === 'income' ? transaction.amount : -transaction.amount)}`}>
+                  {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {transaction.payment_method || '-'}

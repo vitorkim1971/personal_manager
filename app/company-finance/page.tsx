@@ -11,7 +11,7 @@ import CompanyTransactionForm from '@/components/features/CompanyTransactionForm
 import BudgetForm from '@/components/features/BudgetForm';
 import BudgetList from '@/components/features/BudgetList';
 import type { CompanyAccount, CompanyFinanceSummary, CompanyTransaction, Budget } from '@/types';
-import { formatCurrency, calculateGrowthRate, formatPercentage, formatDateKorean } from '@/lib/utils';
+import { formatCurrency, calculateGrowthRate, formatPercentage, formatDateKorean, getAmountColorClass } from '@/lib/utils';
 import { format } from 'date-fns';
 
 export default function CompanyFinancePage() {
@@ -393,7 +393,7 @@ export default function CompanyFinancePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className={`text-lg font-bold ${getTypeColor(transaction.type)}`}>
+                    <div className={`text-lg font-bold ${getAmountColorClass(transaction.type === 'income' ? transaction.amount : -transaction.amount)}`}>
                       {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
                       {formatCurrency(transaction.amount)}
                     </div>
