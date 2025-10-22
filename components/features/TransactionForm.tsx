@@ -108,8 +108,12 @@ export default function TransactionForm({ transaction, onClose, onSuccess }: Tra
         <Input
           label="금액"
           type="number"
-          value={formData.amount}
-          onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+          value={formData.amount || ''}
+          onChange={(e) => {
+            const value = e.target.value;
+            const numValue = value === '' ? 0 : parseFloat(value);
+            setFormData({ ...formData, amount: isNaN(numValue) ? 0 : numValue });
+          }}
           required
           min="0"
           step="1"

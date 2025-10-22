@@ -122,7 +122,11 @@ export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetF
             label="예산 금액"
             type="number"
             value={formData.budgeted_amount || ''}
-            onChange={(e) => setFormData({ ...formData, budgeted_amount: parseFloat(e.target.value) || 0 })}
+            onChange={(e) => {
+              const value = e.target.value;
+              const numValue = value === '' ? 0 : parseFloat(value);
+              setFormData({ ...formData, budgeted_amount: isNaN(numValue) ? 0 : numValue });
+            }}
             required
             placeholder="0"
             step="0.01"
@@ -132,7 +136,11 @@ export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetF
             label="지출 금액"
             type="number"
             value={formData.spent_amount || ''}
-            onChange={(e) => setFormData({ ...formData, spent_amount: parseFloat(e.target.value) || 0 })}
+            onChange={(e) => {
+              const value = e.target.value;
+              const numValue = value === '' ? 0 : parseFloat(value);
+              setFormData({ ...formData, spent_amount: isNaN(numValue) ? 0 : numValue });
+            }}
             placeholder="0"
             step="0.01"
           />
@@ -141,16 +149,16 @@ export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetF
         <div className="grid grid-cols-2 gap-4">
           <Select
             label="년도"
-            value={formData.year || ''}
-            onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+            value={formData.year ? formData.year.toString() : ''}
+            onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || new Date().getFullYear() })}
             options={years}
             required
           />
 
           <Select
             label="월"
-            value={formData.month || ''}
-            onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) })}
+            value={formData.month ? formData.month.toString() : ''}
+            onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) || new Date().getMonth() + 1 })}
             options={months}
             required
           />

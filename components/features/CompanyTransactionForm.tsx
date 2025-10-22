@@ -29,7 +29,7 @@ const expenseCategories = [
 ];
 
 export default function CompanyTransactionForm({ transaction, accounts, onClose, onSuccess }: CompanyTransactionFormProps) {
-  const defaultAccountId = accounts.length > 0 ? accounts[0].id : 0;
+  const defaultAccountId = accounts.length > 0 ? accounts[0].id : 1;
   
   const [formData, setFormData] = useState<CreateCompanyTransactionInput>({
     account_id: defaultAccountId,
@@ -92,8 +92,8 @@ export default function CompanyTransactionForm({ transaction, accounts, onClose,
       <form onSubmit={handleSubmit} className="space-y-4">
         <Select
           label="계좌"
-          value={formData.account_id.toString()}
-          onChange={(e) => setFormData({ ...formData, account_id: parseInt(e.target.value) })}
+          value={formData.account_id ? formData.account_id.toString() : ''}
+          onChange={(e) => setFormData({ ...formData, account_id: parseInt(e.target.value) || 1 })}
           options={accounts.map(acc => ({ value: acc.id.toString(), label: acc.account_name }))}
         />
 
@@ -118,8 +118,12 @@ export default function CompanyTransactionForm({ transaction, accounts, onClose,
         <Input
           label="금액"
           type="number"
-          value={formData.amount}
-          onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+          value={formData.amount || ''}
+          onChange={(e) => {
+            const value = e.target.value;
+            const numValue = value === '' ? 0 : parseFloat(value);
+            setFormData({ ...formData, amount: isNaN(numValue) ? 0 : numValue });
+          }}
           required
           min="0"
           step="0.01"
