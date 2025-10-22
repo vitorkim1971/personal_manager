@@ -15,10 +15,12 @@ import CategoryPieChart from '@/components/features/CategoryPieChart';
 export default function DashboardPage() {
   const [todayStats, setTodayStats] = useState<TodayTaskStats | null>(null);
   const [monthlySummary, setMonthlySummary] = useState<MonthlySummary | null>(null);
+  const [yearlySummary, setYearlySummary] = useState<any>(null);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategorySummary[]>([]);
   const [activeProjects, setActiveProjects] = useState<Project[]>([]);
   const [companySummary, setCompanySummary] = useState<CompanyFinanceSummary | null>(null);
+  const [companyYearlySummary, setCompanyYearlySummary] = useState<CompanyFinanceSummary | null>(null);
   const [companyAccounts, setCompanyAccounts] = useState<CompanyAccount[]>([]);
   const [personalBudgets, setPersonalBudgets] = useState<Budget[]>([]);
   const [companyBudgets, setCompanyBudgets] = useState<Budget[]>([]);
@@ -39,6 +41,10 @@ export default function DashboardPage() {
       const monthlyData = await monthlyRes.json();
       setMonthlySummary(monthlyData);
 
+      const yearlyRes = await fetch('/api/stats?type=yearly&year=2025');
+      const yearlyData = await yearlyRes.json();
+      setYearlySummary(yearlyData);
+
       const transactionsRes = await fetch('/api/transactions');
       const transactionsData = await transactionsRes.json();
       setRecentTransactions(transactionsData.slice(0, 5));
@@ -56,6 +62,10 @@ export default function DashboardPage() {
       const companyStatsRes = await fetch('/api/company-stats?type=monthly&month=2025-10');
       const companyStatsData = await companyStatsRes.json();
       setCompanySummary(companyStatsData);
+
+      const companyYearlyRes = await fetch('/api/company-stats?type=yearly&year=2025');
+      const companyYearlyData = await companyYearlyRes.json();
+      setCompanyYearlySummary(companyYearlyData);
 
       const companyAccountsRes = await fetch('/api/company-accounts');
       const companyAccountsData = await companyAccountsRes.json();
@@ -126,16 +136,16 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {monthlySummary ? (
+              {monthlySummary && yearlySummary ? (
                 <>
-                  <div className="text-2xl font-bold text-green-600">
-                    {formatCurrency(monthlySummary.totalIncome)}
+                  <div className="text-lg font-bold text-green-600">
+                    연간 {formatCurrency(yearlySummary.totalIncome)}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    수입 · 지출 {formatCurrency(monthlySummary.totalExpense)}
+                    월간 {formatCurrency(monthlySummary.totalIncome)} · 지출 {formatCurrency(monthlySummary.totalExpense)}
                   </div>
-                  <div className={`text-sm mt-1 ${monthlySummary.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    순손익 {formatCurrency(monthlySummary.netIncome)}
+                  <div className={`text-sm mt-1 ${yearlySummary.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    연간 순수익 {formatCurrency(yearlySummary.netIncome)}
                   </div>
                 </>
               ) : (
@@ -155,13 +165,13 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {companySummary ? (
+              {companySummary && companyYearlySummary ? (
                 <>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {formatCurrency(companySummary.totalIncome)}
+                  <div className="text-lg font-bold text-blue-600">
+                    연간 {formatCurrency(companyYearlySummary.totalIncome)}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    수입 · 지출 {formatCurrency(companySummary.totalExpense)}
+                    월간 {formatCurrency(companySummary.totalIncome)} · 지출 {formatCurrency(companySummary.totalExpense)}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
                     계좌 {companyAccounts.length}개
