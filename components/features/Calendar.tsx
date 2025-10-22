@@ -3,18 +3,32 @@
 import { useState, useEffect } from 'react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import type { Task } from '@/types';
+import type { Task, Transaction, CompanyTransaction } from '@/types';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isPast, addMonths, subMonths } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { formatCurrency } from '@/lib/utils';
 
 interface CalendarProps {
   tasks: Task[];
+  transactions?: Transaction[];
+  companyTransactions?: CompanyTransaction[];
   onTaskClick?: (task: Task) => void;
+  onTransactionClick?: (transaction: Transaction) => void;
+  onCompanyTransactionClick?: (transaction: CompanyTransaction) => void;
 }
 
-export default function Calendar({ tasks, onTaskClick }: CalendarProps) {
+export default function Calendar({ 
+  tasks, 
+  transactions = [], 
+  companyTransactions = [], 
+  onTaskClick, 
+  onTransactionClick, 
+  onCompanyTransactionClick 
+}: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasksByDate, setTasksByDate] = useState<Map<string, Task[]>>(new Map());
+  const [transactionsByDate, setTransactionsByDate] = useState<Map<string, Transaction[]>>(new Map());
+  const [companyTransactionsByDate, setCompanyTransactionsByDate] = useState<Map<string, CompanyTransaction[]>>(new Map());
 
   useEffect(() => {
     // 날짜별로 작업 그룹화
@@ -32,6 +46,36 @@ export default function Calendar({ tasks, onTaskClick }: CalendarProps) {
     
     setTasksByDate(groupedTasks);
   }, [tasks]);
+
+  useEffect(() => {
+    // 날짜별로 개인 거래 그룹화
+    const groupedTransactions = new Map<string, Transaction[]>();
+    
+    transactions.forEach(transaction => {
+      const dateKey = format(new Date(transaction.date), 'yyyy-MM-dd');
+      if (!groupedTransactions.has(dateKey)) {
+        groupedTransactions.set(dateKey, []);
+      }
+      groupedTransactions.get(dateKey)!.push(transaction);
+    });
+    
+    setTransactionsByDate(groupedTransactions);
+  }, [transactions]);
+
+  useEffect(() => {
+    // 날짜별로 회사 거래 그룹화
+    const groupedCompanyTransactions = new Map<string, CompanyTransaction[]>();
+    
+    companyTransactions.forEach(transaction => {
+      const dateKey = format(new Date(transaction.date), 'yyyy-MM-dd');
+      if (!groupedCompanyTransactions.has(dateKey)) {
+        groupedCompanyTransactions.set(dateKey, []);
+      }
+      groupedCompanyTransactions.get(dateKey)!.push(transaction);
+    });
+    
+    setCompanyTransactionsByDate(groupedCompanyTransactions);
+  }, [companyTransactions]);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -111,28 +155,60 @@ export default function Calendar({ tasks, onTaskClick }: CalendarProps) {
           {calendarDays.map(day => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayTasks = tasksByDate.get(dateKey) || [];
+            const dayTransactions = transactionsByDate.get(dateKey) || [];
+            const dayCompanyTransactions = companyTransactionsByDate.get(dateKey) || [];
+            
+            // 총 항목 수 계산
+            const totalItems = dayTasks.length + dayTransactions.length + dayCompanyTransactions.length;
             
             return (
-              <div key={dateKey} className="min-h-[60px] border border-gray-100 p-1">
+              <div key={dateKey} className="min-h-[80px] border border-gray-100 p-1">
                 <div className={getDayClasses(day)}>
                   {format(day, 'd')}
                 </div>
                 
-                {/* 해당 날짜의 작업들 */}
+                {/* 해당 날짜의 모든 항목들 */}
                 <div className="mt-1 space-y-1">
-                  {dayTasks.slice(0, 2).map(task => (
+                  {/* 작업들 */}
+                  {dayTasks.slice(0, 1).map(task => (
                     <div
-                      key={task.id}
+                      key={`task-${task.id}`}
                       className={`text-xs px-1 py-0.5 rounded cursor-pointer truncate ${getTaskStatusColor(task)}`}
                       onClick={() => onTaskClick?.(task)}
-                      title={task.title}
+                      title={`업무: ${task.title}`}
                     >
-                      {task.title}
+                      📋 {task.title}
                     </div>
                   ))}
-                  {dayTasks.length > 2 && (
+                  
+                  {/* 개인 거래들 */}
+                  {dayTransactions.slice(0, 1).map(transaction => (
+                    <div
+                      key={`transaction-${transaction.id}`}
+                      className={`text-xs px-1 py-0.5 rounded cursor-pointer truncate ${transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                      onClick={() => onTransactionClick?.(transaction)}
+                      title={`개인재정: ${transaction.category} ${transaction.type === 'income' ? '+' : '-'}${formatCurrency(transaction.amount)}`}
+                    >
+                      💰 {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                    </div>
+                  ))}
+                  
+                  {/* 회사 거래들 */}
+                  {dayCompanyTransactions.slice(0, 1).map(transaction => (
+                    <div
+                      key={`company-${transaction.id}`}
+                      className={`text-xs px-1 py-0.5 rounded cursor-pointer truncate ${transaction.type === 'income' ? 'bg-green-100 text-green-800' : transaction.type === 'expense' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}
+                      onClick={() => onCompanyTransactionClick?.(transaction)}
+                      title={`회사재무: ${transaction.category} ${transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : '↔'}${formatCurrency(transaction.amount)}`}
+                    >
+                      🏢 {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : '↔'}{formatCurrency(transaction.amount)}
+                    </div>
+                  ))}
+                  
+                  {/* 더 많은 항목이 있을 때 */}
+                  {totalItems > 3 && (
                     <div className="text-xs text-gray-500 px-1">
-                      +{dayTasks.length - 2}개 더
+                      +{totalItems - 3}개 더
                     </div>
                   )}
                 </div>
@@ -145,11 +221,11 @@ export default function Calendar({ tasks, onTaskClick }: CalendarProps) {
         <div className="mt-4 flex flex-wrap gap-4 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-green-100 rounded"></div>
-            <span>완료</span>
+            <span>완료 작업</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-blue-100 rounded"></div>
-            <span>진행중</span>
+            <span>진행중 작업</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-gray-100 rounded"></div>
@@ -157,7 +233,15 @@ export default function Calendar({ tasks, onTaskClick }: CalendarProps) {
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-red-100 rounded"></div>
-            <span>지연</span>
+            <span>지연/지출</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-green-600">💰</span>
+            <span>개인재정</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-blue-600">🏢</span>
+            <span>회사재무</span>
           </div>
         </div>
       </div>

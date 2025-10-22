@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import { formatCurrency, formatDateKorean } from '@/lib/utils';
 import type { 
   TodayTaskStats, MonthlySummary, Transaction, CategorySummary, 
-  Project, CompanyFinanceSummary, CompanyAccount, Budget 
+  Project, CompanyFinanceSummary, CompanyAccount, Budget, CompanyTransaction 
 } from '@/types';
 import IncomeExpenseChart from '@/components/features/IncomeExpenseChart';
 import CategoryPieChart from '@/components/features/CategoryPieChart';
@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [companySummary, setCompanySummary] = useState<CompanyFinanceSummary | null>(null);
   const [companyBalance, setCompanyBalance] = useState<any>(null);
   const [companyAccounts, setCompanyAccounts] = useState<CompanyAccount[]>([]);
+  const [companyTransactions, setCompanyTransactions] = useState<CompanyTransaction[]>([]);
   const [personalBudgets, setPersonalBudgets] = useState<Budget[]>([]);
   const [companyBudgets, setCompanyBudgets] = useState<Budget[]>([]);
   const [recentTasks, setRecentTasks] = useState<any[]>([]);
@@ -71,6 +72,10 @@ export default function DashboardPage() {
       const companyAccountsRes = await fetch('/api/company-accounts');
       const companyAccountsData = await companyAccountsRes.json();
       setCompanyAccounts(companyAccountsData);
+
+      const companyTransactionsRes = await fetch('/api/company-transactions');
+      const companyTransactionsData = await companyTransactionsRes.json();
+      setCompanyTransactions(companyTransactionsData);
 
       // 예산 관련
       const personalBudgetsRes = await fetch('/api/budgets?type=personal&year=2025&month=10');
@@ -446,9 +451,19 @@ export default function DashboardPage() {
           <div className="lg:col-span-2">
             <Calendar 
               tasks={recentTasks} 
+              transactions={recentTransactions}
+              companyTransactions={companyTransactions}
               onTaskClick={(task) => {
                 // 작업 클릭 시 업무관리 페이지로 이동
                 window.location.href = '/tasks';
+              }}
+              onTransactionClick={(transaction) => {
+                // 개인 거래 클릭 시 재정관리 페이지로 이동
+                window.location.href = '/finance';
+              }}
+              onCompanyTransactionClick={(transaction) => {
+                // 회사 거래 클릭 시 회사재무 페이지로 이동
+                window.location.href = '/company-finance';
               }}
             />
           </div>
