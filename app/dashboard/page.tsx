@@ -98,29 +98,30 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                업무관리
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">📋 업무관리 메뉴</div>
+                  업무관리
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/tasks'}>
                   보기
                 </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {todayStats ? (
+              {recentTasks.length > 0 ? (
                 <>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {todayStats.completed}/{todayStats.total}
+                  <div className="text-2xl font-bold text-blue-600">
+                    {recentTasks.filter(task => task.status === 'completed').length}/{recentTasks.length}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    완료 {todayStats.completed}개 · 진행중 {todayStats.inProgress}개
+                    완료 {recentTasks.filter(task => task.status === 'completed').length}개 · 진행중 {recentTasks.filter(task => task.status === 'in_progress').length}개
                   </div>
-                  {todayStats.overdue > 0 && (
-                    <div className="text-sm text-red-600 mt-1">
-                      ⚠️ 지연 {todayStats.overdue}개
-                    </div>
-                  )}
+                  <div className="text-sm text-gray-500 mt-1">
+                    총 {recentTasks.length}개 작업
+                  </div>
                 </>
               ) : (
-                <div className="text-gray-500">데이터 로딩 중...</div>
+                <div className="text-gray-500">작업이 없습니다</div>
               )}
             </CardContent>
           </Card>
@@ -129,7 +130,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                개인 재정
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">💰 재정관리 메뉴</div>
+                  개인 재정
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/finance'}>
                   보기
                 </Button>
@@ -158,7 +162,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                회사재무
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">🏢 회사재무 메뉴</div>
+                  회사재무
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/company-finance'}>
                   보기
                 </Button>
@@ -187,7 +194,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                프로젝트
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">📁 프로젝트 메뉴</div>
+                  프로젝트
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/projects'}>
                   보기
                 </Button>
@@ -215,7 +225,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                개인 예산 현황
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">💰 재정관리 메뉴</div>
+                  개인 예산 현황
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/finance'}>
                   관리
                 </Button>
@@ -246,7 +259,8 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
-                  등록된 개인 예산이 없습니다.
+                  <div className="text-sm mb-2">등록된 개인 예산이 없습니다.</div>
+                  <div className="text-xs text-gray-400">재정관리 메뉴에서 예산을 등록해보세요.</div>
                 </div>
               )}
             </CardContent>
@@ -256,7 +270,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                회사 예산 현황
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">🏢 회사재무 메뉴</div>
+                  회사 예산 현황
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/company-finance'}>
                   관리
                 </Button>
@@ -287,7 +304,8 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
-                  등록된 회사 예산이 없습니다.
+                  <div className="text-sm mb-2">등록된 회사 예산이 없습니다.</div>
+                  <div className="text-xs text-gray-400">회사재무 메뉴에서 예산을 등록해보세요.</div>
                 </div>
               )}
             </CardContent>
@@ -300,7 +318,10 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                최근 할 일
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">📋 업무관리 메뉴</div>
+                  최근 할 일
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => window.location.href = '/tasks'}>
                   전체보기
                 </Button>
@@ -338,8 +359,11 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                최근 거래
-                <Button variant="ghost" size="sm" onClick={() => window.location.href = '/finance'}>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">💰 재정관리 메뉴</div>
+                  최근 거래
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => window.location.href = '/finance/transactions'}>
                   전체보기
                 </Button>
               </CardTitle>
@@ -373,7 +397,12 @@ export default function DashboardPage() {
           {/* 수입/지출 추이 */}
           <Card>
             <CardHeader>
-              <CardTitle>최근 30일 추이</CardTitle>
+              <CardTitle>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">💰 재정관리 메뉴</div>
+                  최근 30일 추이
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <IncomeExpenseChart />
@@ -383,7 +412,12 @@ export default function DashboardPage() {
           {/* 카테고리별 지출 */}
           <Card>
             <CardHeader>
-              <CardTitle>카테고리별 지출</CardTitle>
+              <CardTitle>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">💰 재정관리 메뉴</div>
+                  카테고리별 지출
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <CategoryPieChart data={categoryStats} />
