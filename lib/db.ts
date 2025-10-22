@@ -95,6 +95,32 @@ export function initDB() {
     CREATE INDEX IF NOT EXISTS idx_budgets_month_year ON budgets(month, year);
   `);
 
+  // Files 테이블 (PRD 7.2.4)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS files (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      original_name TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      file_size INTEGER NOT NULL,
+      file_type TEXT,
+      category TEXT,
+      task_id INTEGER,
+      project_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Files 인덱스
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_files_category ON files(category);
+    CREATE INDEX IF NOT EXISTS idx_files_task_id ON files(task_id);
+    CREATE INDEX IF NOT EXISTS idx_files_project_id ON files(project_id);
+  `);
+
   // Settings 테이블 (PRD 7.2.7)
   db.exec(`
     CREATE TABLE IF NOT EXISTS settings (

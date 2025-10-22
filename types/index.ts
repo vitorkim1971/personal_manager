@@ -144,6 +144,32 @@ export interface UpdateBudgetInput {
   year?: number;
 }
 
+// File (파일)
+export interface File {
+  id: number;
+  name: string;
+  original_name: string;
+  file_path: string;
+  file_size: number;
+  file_type?: string;
+  category?: string;
+  task_id?: number;
+  project_id?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateFileInput {
+  name: string;
+  original_name: string;
+  file_path: string;
+  file_size: number;
+  file_type?: string;
+  category?: string;
+  task_id?: number;
+  project_id?: number;
+}
+
 // Settings (설정)
 export interface Setting {
   id: number;
