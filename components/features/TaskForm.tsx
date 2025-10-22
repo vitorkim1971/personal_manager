@@ -252,8 +252,9 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
           value={formData.status}
           onChange={(e) => setFormData({ ...formData, status: e.target.value as TaskStatus })}
           options={[
-            { value: 'todo', label: '할 일' },
-            { value: 'in_progress', label: '진행 중' },
+            { value: 'todo', label: '할일' },
+            { value: 'in_progress', label: '진행중' },
+            { value: 'overdue', label: '지연' },
             { value: 'completed', label: '완료' },
           ]}
         />

@@ -1,7 +1,7 @@
 // PRD 7.2 스키마 기반 TypeScript 타입 정의
 
 export type Priority = 'high' | 'medium' | 'low';
-export type TaskStatus = 'todo' | 'in_progress' | 'completed';
+export type TaskStatus = 'todo' | 'in_progress' | 'overdue' | 'completed';
 export type TaskCategory = '업무' | '개인' | '프로젝트';
 
 export type TransactionType = 'income' | 'expense';

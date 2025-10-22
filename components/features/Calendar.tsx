@@ -35,11 +35,20 @@ export default function Calendar({ tasks, onTaskClick }: CalendarProps) {
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
-  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  
+  // 달력 그리드를 위해 월의 첫 번째 날이 시작하는 요일을 맞춤
+  const calendarStart = new Date(monthStart);
+  calendarStart.setDate(calendarStart.getDate() - calendarStart.getDay()); // 일요일로 맞춤
+  
+  const calendarEnd = new Date(monthEnd);
+  calendarEnd.setDate(calendarEnd.getDate() + (6 - calendarEnd.getDay())); // 토요일로 맞춤
+  
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   const getTaskStatusColor = (task: Task) => {
     if (task.status === 'completed') return 'bg-green-100 text-green-800';
     if (task.status === 'in_progress') return 'bg-blue-100 text-blue-800';
+    if (task.status === 'overdue') return 'bg-red-100 text-red-800';
     if (isPast(new Date(task.due_date!)) && task.status !== 'completed') return 'bg-red-100 text-red-800';
     return 'bg-gray-100 text-gray-800';
   };

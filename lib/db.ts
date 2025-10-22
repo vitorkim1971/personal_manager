@@ -15,7 +15,7 @@ function initDB() {
       due_date DATETIME,
       priority TEXT CHECK(priority IN ('high', 'medium', 'low')) DEFAULT 'medium',
       category TEXT NOT NULL,
-      status TEXT CHECK(status IN ('todo', 'in_progress', 'completed')) DEFAULT 'todo',
+      status TEXT CHECK(status IN ('todo', 'in_progress', 'overdue', 'completed')) DEFAULT 'todo',
       project_id INTEGER,
       reference_links TEXT,
       attached_files TEXT,
