@@ -256,26 +256,48 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {personalBudgets.length > 0 ? (
-                <div className="space-y-2">
-                  {personalBudgets.slice(0, 3).map((budget) => {
-                    const usage = budget.budgeted_amount > 0 ? (budget.spent_amount / budget.budgeted_amount) * 100 : 0;
-                    return (
-                      <div key={budget.id} className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{budget.category}</div>
-                          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div className="space-y-3">
+                  {/* 총 예산 요약 */}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">총 예산</span>
+                      <span className="text-lg font-bold text-blue-600">
+                        {formatCurrency(personalBudgets.reduce((sum, budget) => sum + budget.budgeted_amount, 0))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">총 사용</span>
+                      <span className="text-lg font-bold text-red-600">
+                        {formatCurrency(personalBudgets.reduce((sum, budget) => sum + budget.spent_amount, 0))}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* 개별 예산 항목 */}
+                  <div className="space-y-2">
+                    {personalBudgets.map((budget) => {
+                      const usage = budget.budgeted_amount > 0 ? (budget.spent_amount / budget.budgeted_amount) * 100 : 0;
+                      return (
+                        <div key={budget.id} className="border-b border-gray-100 pb-2 last:border-b-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-sm font-medium">{budget.category}</div>
+                            <div className="text-xs text-gray-600">
+                              {formatCurrency(budget.spent_amount)} / {formatCurrency(budget.budgeted_amount)}
+                            </div>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${usage >= 100 ? 'bg-red-500' : usage >= 80 ? 'bg-yellow-500' : 'bg-green-500'}`}
                               style={{ width: `${Math.min(usage, 100)}%` }}
                             />
                           </div>
+                          <div className="text-xs text-gray-500 mt-1 text-right">
+                            {usage.toFixed(0)}%
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-600 ml-2">
-                          {usage.toFixed(0)}%
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
@@ -301,26 +323,48 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {companyBudgets.length > 0 ? (
-                <div className="space-y-2">
-                  {companyBudgets.slice(0, 3).map((budget) => {
-                    const usage = budget.budgeted_amount > 0 ? (budget.spent_amount / budget.budgeted_amount) * 100 : 0;
-                    return (
-                      <div key={budget.id} className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{budget.category}</div>
-                          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div className="space-y-3">
+                  {/* 총 예산 요약 */}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">총 예산</span>
+                      <span className="text-lg font-bold text-blue-600">
+                        {formatCurrency(companyBudgets.reduce((sum, budget) => sum + budget.budgeted_amount, 0))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">총 사용</span>
+                      <span className="text-lg font-bold text-red-600">
+                        {formatCurrency(companyBudgets.reduce((sum, budget) => sum + budget.spent_amount, 0))}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* 개별 예산 항목 */}
+                  <div className="space-y-2">
+                    {companyBudgets.map((budget) => {
+                      const usage = budget.budgeted_amount > 0 ? (budget.spent_amount / budget.budgeted_amount) * 100 : 0;
+                      return (
+                        <div key={budget.id} className="border-b border-gray-100 pb-2 last:border-b-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-sm font-medium">{budget.category}</div>
+                            <div className="text-xs text-gray-600">
+                              {formatCurrency(budget.spent_amount)} / {formatCurrency(budget.budgeted_amount)}
+                            </div>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${usage >= 100 ? 'bg-red-500' : usage >= 80 ? 'bg-yellow-500' : 'bg-green-500'}`}
                               style={{ width: `${Math.min(usage, 100)}%` }}
                             />
                           </div>
+                          <div className="text-xs text-gray-500 mt-1 text-right">
+                            {usage.toFixed(0)}%
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-600 ml-2">
-                          {usage.toFixed(0)}%
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
