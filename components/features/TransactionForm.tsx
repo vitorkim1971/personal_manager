@@ -127,7 +127,7 @@ export default function TransactionForm({ transaction, onClose, onSuccess }: Tra
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">메모</label>
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={2}
             value={formData.memo}
             onChange={(e) => setFormData({ ...formData, memo: e.target.value })}

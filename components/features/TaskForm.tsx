@@ -75,7 +75,7 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={3}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
