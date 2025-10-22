@@ -5,7 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import TaskForm from '@/components/features/TaskForm';
-import TaskList from '@/components/features/TaskList';
+import KanbanBoard from '@/components/features/KanbanBoard';
 import type { Task, Priority, TaskStatus, TaskCategory, Project } from '@/types';
 
 export default function TasksPage() {
@@ -13,16 +13,10 @@ export default function TasksPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [filter, setFilter] = useState<{
-    status?: TaskStatus;
-    priority?: Priority;
-    category?: TaskCategory;
-  }>({});
-
   useEffect(() => {
     fetchTasks();
     fetchProjects();
-  }, [filter]);
+  }, []);
 
   const fetchProjects = async () => {
     try {
@@ -36,12 +30,7 @@ export default function TasksPage() {
 
   const fetchTasks = async () => {
     try {
-      const params = new URLSearchParams();
-      if (filter.status) params.append('status', filter.status);
-      if (filter.priority) params.append('priority', filter.priority);
-      if (filter.category) params.append('category', filter.category);
-
-      const response = await fetch(`/api/tasks?${params.toString()}`);
+      const response = await fetch('/api/tasks');
       const data = await response.json();
       setTasks(data);
     } catch (error) {
@@ -70,17 +59,17 @@ export default function TasksPage() {
     }
   };
 
-  const handleToggleComplete = async (task: Task) => {
+
+  const handleStatusChange = async (taskId: number, newStatus: string) => {
     try {
-      const newStatus: TaskStatus = task.status === 'completed' ? 'todo' : 'completed';
-      await fetch(`/api/tasks/${task.id}`, {
+      await fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
       fetchTasks();
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error('Error updating task status:', error);
     }
   };
 
@@ -100,57 +89,13 @@ export default function TasksPage() {
       }
     >
       <div className="space-y-6">
-        {/* 필터 */}
-        <Card>
-          <div className="flex gap-4">
-            <select
-              className="px-3 py-2 border border-gray-300 rounded-lg"
-              value={filter.status || ''}
-              onChange={(e) => setFilter({ ...filter, status: e.target.value as TaskStatus || undefined })}
-            >
-              <option value="">전체 상태</option>
-              <option value="todo">할 일</option>
-              <option value="in_progress">진행 중</option>
-              <option value="completed">완료</option>
-            </select>
-
-            <select
-              className="px-3 py-2 border border-gray-300 rounded-lg"
-              value={filter.priority || ''}
-              onChange={(e) => setFilter({ ...filter, priority: e.target.value as Priority || undefined })}
-            >
-              <option value="">전체 우선순위</option>
-              <option value="high">높음</option>
-              <option value="medium">보통</option>
-              <option value="low">낮음</option>
-            </select>
-
-            <select
-              className="px-3 py-2 border border-gray-300 rounded-lg"
-              value={filter.category || ''}
-              onChange={(e) => setFilter({ ...filter, category: e.target.value as TaskCategory || undefined })}
-            >
-              <option value="">전체 카테고리</option>
-              <option value="업무">업무</option>
-              <option value="개인">개인</option>
-              <option value="프로젝트">프로젝트</option>
-            </select>
-
-            {(filter.status || filter.priority || filter.category) && (
-              <Button variant="ghost" onClick={() => setFilter({})}>
-                필터 초기화
-              </Button>
-            )}
-          </div>
-        </Card>
-
-        {/* 작업 목록 */}
-        <TaskList
+        {/* 칸반보드 */}
+        <KanbanBoard
           tasks={tasks}
           projects={projects}
           onEdit={handleEditTask}
           onDelete={handleDeleteTask}
-          onToggleComplete={handleToggleComplete}
+          onStatusChange={handleStatusChange}
         />
       </div>
 
