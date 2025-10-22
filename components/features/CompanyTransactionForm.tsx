@@ -25,6 +25,7 @@ const expenseCategories = [
   '여비교통비',
   '통신비',
   '접대비',
+  '서버 및 SaaS',
   '기타지출'
 ];
 
