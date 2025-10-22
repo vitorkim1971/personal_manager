@@ -7,20 +7,25 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import CompanyAccountList from '@/components/features/CompanyAccountList';
 import CompanyAccountForm from '@/components/features/CompanyAccountForm';
-import type { CompanyAccount, CompanyFinanceSummary } from '@/types';
-import { formatCurrency, calculateGrowthRate, formatPercentage } from '@/lib/utils';
+import CompanyTransactionForm from '@/components/features/CompanyTransactionForm';
+import type { CompanyAccount, CompanyFinanceSummary, CompanyTransaction } from '@/types';
+import { formatCurrency, calculateGrowthRate, formatPercentage, formatDateKorean } from '@/lib/utils';
 import { format } from 'date-fns';
 
 export default function CompanyFinancePage() {
   const router = useRouter();
   const [accounts, setAccounts] = useState<CompanyAccount[]>([]);
+  const [transactions, setTransactions] = useState<CompanyTransaction[]>([]);
   const [summary, setSummary] = useState<CompanyFinanceSummary | null>(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<CompanyAccount | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<CompanyTransaction | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
 
   useEffect(() => {
     fetchAccounts();
+    fetchTransactions();
     fetchSummary();
   }, [selectedMonth]);
 
@@ -31,6 +36,21 @@ export default function CompanyFinancePage() {
       setAccounts(data);
     } catch (error) {
       console.error('Error fetching accounts:', error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const [year, month] = selectedMonth.split('-');
+      const startDate = `${year}-${month}-01`;
+      const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+      const endDate = `${year}-${month}-${lastDay}`;
+      
+      const response = await fetch(`/api/company-transactions?startDate=${startDate}&endDate=${endDate}`);
+      const data = await response.json();
+      setTransactions(data.slice(0, 10)); // 최근 10개만
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
     }
   };
 
@@ -66,9 +86,40 @@ export default function CompanyFinancePage() {
     }
   };
 
-  const handleFormSuccess = () => {
+  const handleCreateTransaction = () => {
+    setEditingTransaction(null);
+    setIsTransactionModalOpen(true);
+  };
+
+  const handleEditTransaction = (transaction: CompanyTransaction) => {
+    setEditingTransaction(transaction);
+    setIsTransactionModalOpen(true);
+  };
+
+  const handleDeleteTransaction = async (id: number) => {
+    if (!confirm('이 거래를 삭제하시겠습니까?')) return;
+
+    try {
+      await fetch(`/api/company-transactions/${id}`, { method: 'DELETE' });
+      fetchTransactions();
+      fetchAccounts();
+      fetchSummary();
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  };
+
+  const handleAccountFormSuccess = () => {
     setIsAccountModalOpen(false);
     setEditingAccount(null);
+    fetchAccounts();
+    fetchSummary();
+  };
+
+  const handleTransactionFormSuccess = () => {
+    setIsTransactionModalOpen(false);
+    setEditingTransaction(null);
+    fetchTransactions();
     fetchAccounts();
     fetchSummary();
   };
@@ -81,10 +132,20 @@ export default function CompanyFinancePage() {
     ? calculateGrowthRate(summary.totalExpense, summary.prevMonthExpense)
     : 0;
 
+  const getAccountName = (accountId: number) => {
+    return accounts.find(acc => acc.id === accountId)?.account_name || '-';
+  };
+
+  const getTypeColor = (type: string) => {
+    if (type === 'income') return 'text-green-600';
+    if (type === 'expense') return 'text-red-600';
+    return 'text-blue-600';
+  };
+
   return (
     <MainLayout title="회사 재무관리">
       <div className="space-y-6">
-        {/* 월별 선택 */}
+        {/* 월별 선택 및 액션 버튼 */}
         <Card>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -94,10 +155,13 @@ export default function CompanyFinancePage() {
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
               />
-              <Button onClick={() => router.push('/company-finance/transactions')}>
-                거래 내역 보기
+              <Button onClick={handleCreateTransaction} variant="primary">
+                + 수입/지출 추가
               </Button>
             </div>
+            <Button variant="ghost" onClick={() => router.push('/company-finance/transactions')}>
+              전체 거래 내역 →
+            </Button>
           </div>
         </Card>
 
@@ -152,6 +216,61 @@ export default function CompanyFinancePage() {
           </div>
         )}
 
+        {/* 최근 거래 내역 */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">최근 거래 내역</h2>
+          </div>
+          {transactions.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              거래 내역이 없습니다.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {transactions.map((transaction) => (
+                <div key={transaction.id} className="flex items-center justify-between py-3 border-b last:border-0">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-sm font-semibold ${getTypeColor(transaction.type)}`}>
+                        {transaction.type === 'income' ? '수입' : transaction.type === 'expense' ? '지출' : '이체'}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">{transaction.category}</span>
+                      {transaction.vendor_customer && (
+                        <span className="text-sm text-gray-500">· {transaction.vendor_customer}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                      <span>{getAccountName(transaction.account_id)}</span>
+                      <span>·</span>
+                      <span>{formatDateKorean(transaction.date)}</span>
+                      {transaction.description && (
+                        <>
+                          <span>·</span>
+                          <span className="truncate max-w-xs">{transaction.description}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className={`text-lg font-bold ${getTypeColor(transaction.type)}`}>
+                      {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
+                      {formatCurrency(transaction.amount)}
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" onClick={() => handleEditTransaction(transaction)}>
+                        수정
+                      </Button>
+                      <Button size="sm" variant="danger" onClick={() => handleDeleteTransaction(transaction.id)}>
+                        삭제
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
         {/* 계좌 관리 */}
         <div>
           <div className="flex items-center justify-between mb-4">
@@ -176,7 +295,20 @@ export default function CompanyFinancePage() {
             setIsAccountModalOpen(false);
             setEditingAccount(null);
           }}
-          onSuccess={handleFormSuccess}
+          onSuccess={handleAccountFormSuccess}
+        />
+      )}
+
+      {/* 거래 생성/수정 모달 */}
+      {isTransactionModalOpen && accounts.length > 0 && (
+        <CompanyTransactionForm
+          transaction={editingTransaction}
+          accounts={accounts}
+          onClose={() => {
+            setIsTransactionModalOpen(false);
+            setEditingTransaction(null);
+          }}
+          onSuccess={handleTransactionFormSuccess}
         />
       )}
     </MainLayout>
