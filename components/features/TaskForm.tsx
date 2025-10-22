@@ -5,7 +5,7 @@ import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import type { Task, CreateTaskInput, Priority, TaskStatus, TaskCategory } from '@/types';
+import type { Task, CreateTaskInput, Priority, TaskStatus, TaskCategory, Project } from '@/types';
 
 interface TaskFormProps {
   task?: Task | null;
@@ -14,6 +14,7 @@ interface TaskFormProps {
 }
 
 export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
+  const [projects, setProjects] = useState<Project[]>([]);
   const [formData, setFormData] = useState<CreateTaskInput>({
     title: '',
     description: '',
@@ -21,7 +22,13 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
     priority: 'medium',
     category: '업무',
     status: 'todo',
+    project_id: undefined,
+    reference_links: '',
   });
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     if (task) {
@@ -32,9 +39,21 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
         priority: task.priority,
         category: task.category,
         status: task.status,
+        project_id: task.project_id,
+        reference_links: task.reference_links || '',
       });
     }
   }, [task]);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      setProjects(data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,13 +122,46 @@ export default function TaskForm({ task, onClose, onSuccess }: TaskFormProps) {
         <Select
           label="카테고리"
           value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value as TaskCategory })}
+          onChange={(e) => {
+            const newCategory = e.target.value as TaskCategory;
+            setFormData({ 
+              ...formData, 
+              category: newCategory,
+              project_id: newCategory === '프로젝트' ? formData.project_id : undefined
+            });
+          }}
           options={[
             { value: '업무', label: '업무' },
             { value: '개인', label: '개인' },
             { value: '프로젝트', label: '프로젝트' },
           ]}
         />
+
+        {formData.category === '프로젝트' && (
+          <Select
+            label="프로젝트 선택"
+            value={formData.project_id ? formData.project_id.toString() : ''}
+            onChange={(e) => setFormData({ ...formData, project_id: parseInt(e.target.value) || undefined })}
+            options={[
+              { value: '', label: '프로젝트를 선택하세요' },
+              ...projects.map(project => ({ 
+                value: project.id.toString(), 
+                label: project.name 
+              }))
+            ]}
+          />
+        )}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">관련 문서 링크</label>
+          <textarea
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={2}
+            value={formData.reference_links}
+            onChange={(e) => setFormData({ ...formData, reference_links: e.target.value })}
+            placeholder="관련 문서나 참고할 수 있는 내용들의 링크를 입력하세요 (여러 링크는 줄바꿈으로 구분)"
+          />
+        </div>
 
         <Select
           label="상태"

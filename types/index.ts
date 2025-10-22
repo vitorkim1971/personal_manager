@@ -27,6 +27,7 @@ export interface Task {
   category: TaskCategory;
   status: TaskStatus;
   project_id?: number;
+  reference_links?: string; // 관련 문서 링크들 (JSON 문자열)
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +40,7 @@ export interface CreateTaskInput {
   category: TaskCategory;
   status?: TaskStatus;
   project_id?: number;
+  reference_links?: string;
 }
 
 export interface UpdateTaskInput {
@@ -49,6 +51,7 @@ export interface UpdateTaskInput {
   category?: TaskCategory;
   status?: TaskStatus;
   project_id?: number;
+  reference_links?: string;
 }
 
 // Transaction (거래)

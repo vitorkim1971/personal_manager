@@ -6,10 +6,11 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import TaskForm from '@/components/features/TaskForm';
 import TaskList from '@/components/features/TaskList';
-import type { Task, Priority, TaskStatus, TaskCategory } from '@/types';
+import type { Task, Priority, TaskStatus, TaskCategory, Project } from '@/types';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<{
@@ -20,7 +21,18 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchTasks();
+    fetchProjects();
   }, [filter]);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      setProjects(data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
 
   const fetchTasks = async () => {
     try {
@@ -135,6 +147,7 @@ export default function TasksPage() {
         {/* 작업 목록 */}
         <TaskList
           tasks={tasks}
+          projects={projects}
           onEdit={handleEditTask}
           onDelete={handleDeleteTask}
           onToggleComplete={handleToggleComplete}

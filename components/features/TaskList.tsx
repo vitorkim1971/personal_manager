@@ -3,17 +3,18 @@
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { getPriorityColor, getPriorityLabel, getStatusColor, getStatusLabel, formatRelativeTime, isDeadlineApproaching, isOverdue } from '@/lib/utils';
-import type { Task } from '@/types';
+import type { Task, Project } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface TaskListProps {
   tasks: Task[];
+  projects?: Project[];
   onEdit: (task: Task) => void;
   onDelete: (id: number) => void;
   onToggleComplete: (task: Task) => void;
 }
 
-export default function TaskList({ tasks, onEdit, onDelete, onToggleComplete }: TaskListProps) {
+export default function TaskList({ tasks, projects = [], onEdit, onDelete, onToggleComplete }: TaskListProps) {
   if (tasks.length === 0) {
     return (
       <Card>
@@ -23,6 +24,12 @@ export default function TaskList({ tasks, onEdit, onDelete, onToggleComplete }: 
       </Card>
     );
   }
+
+  const getProjectName = (projectId?: number) => {
+    if (!projectId) return null;
+    const project = projects.find(p => p.id === projectId);
+    return project?.name || '알 수 없는 프로젝트';
+  };
 
   return (
     <div className="space-y-3">
@@ -86,6 +93,13 @@ export default function TaskList({ tasks, onEdit, onDelete, onToggleComplete }: 
                   {task.category}
                 </span>
 
+                {/* 프로젝트 */}
+                {task.project_id && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    📁 {getProjectName(task.project_id)}
+                  </span>
+                )}
+
                 {/* 마감일 */}
                 {task.due_date && (
                   <span className={cn(
@@ -100,6 +114,29 @@ export default function TaskList({ tasks, onEdit, onDelete, onToggleComplete }: 
                   </span>
                 )}
               </div>
+
+              {/* 관련 링크 */}
+              {task.reference_links && (
+                <div className="mt-3">
+                  <div className="text-xs text-gray-500 mb-1">관련 링크:</div>
+                  <div className="text-xs text-blue-600 space-y-1">
+                    {task.reference_links.split('\n').map((link, index) => (
+                      link.trim() && (
+                        <div key={index}>
+                          <a 
+                            href={link.trim()} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                          >
+                            🔗 {link.trim()}
+                          </a>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </Card>
