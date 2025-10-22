@@ -50,11 +50,11 @@ const UserIcon = () => (
 
 const navigation = [
   { name: '대시보드', href: '/dashboard', icon: DashboardIcon },
-  { name: '업무 관리', href: '/tasks', icon: TaskIcon },
-  { name: '재정 관리', href: '/finance', icon: FinanceIcon },
+  { name: '업무관리', href: '/tasks', icon: TaskIcon },
+  { name: '재정관리', href: '/finance', icon: FinanceIcon },
   { name: '프로젝트', href: '/projects', icon: ProjectIcon },
-  { name: '파일 관리', href: '/files', icon: FileIcon },
-  { name: '설정', href: '/settings', icon: SettingsIcon },
+  { name: '파일관리', href: '/files', icon: FileIcon },
+  { name: '환경설정', href: '/settings', icon: SettingsIcon },
 ];
 
 export default function Sidebar() {
@@ -84,7 +84,7 @@ export default function Sidebar() {
               )}
             >
               <Icon />
-              <span className="font-medium w-[120px]">{item.name}</span>
+              <span className="font-medium">{item.name}</span>
             </Link>
           );
         })}
