@@ -12,7 +12,7 @@ interface BudgetListProps {
 }
 
 export default function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
-  if (budgets.length === 0) {
+  if (!Array.isArray(budgets) || budgets.length === 0) {
     return (
       <Card>
         <div className="text-center py-8">

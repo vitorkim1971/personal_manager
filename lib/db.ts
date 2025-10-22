@@ -80,13 +80,17 @@ function initDB() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS budgets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT CHECK(type IN ('personal', 'company')) DEFAULT 'personal',
       category TEXT NOT NULL,
-      amount DECIMAL(15, 2) NOT NULL,
+      budgeted_amount DECIMAL(15, 2) NOT NULL,
+      spent_amount DECIMAL(15, 2) DEFAULT 0,
       month INTEGER NOT NULL CHECK(month >= 1 AND month <= 12),
       year INTEGER NOT NULL,
+      description TEXT,
+      is_active INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(category, month, year)
+      UNIQUE(type, category, month, year)
     )
   `);
 
