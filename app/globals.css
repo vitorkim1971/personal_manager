@@ -24,3 +24,46 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 전역 텍스트 색상 강화 */
+* {
+  color: #1f2937; /* text-gray-800 */
+}
+
+/* 특정 요소들의 텍스트 색상 강화 */
+.text-gray-500 {
+  color: #374151 !important; /* text-gray-700 */
+}
+
+.text-gray-400 {
+  color: #4b5563 !important; /* text-gray-600 */
+}
+
+.text-gray-300 {
+  color: #6b7280 !important; /* text-gray-500 */
+}
+
+/* 입력 필드 텍스트 강화 */
+input, textarea, select {
+  color: #111827 !important; /* text-gray-900 */
+}
+
+/* 플레이스홀더 텍스트도 더 진하게 */
+::placeholder {
+  color: #6b7280 !important; /* text-gray-500 */
+}
+
+/* 링크 텍스트 강화 */
+a {
+  color: #1d4ed8 !important; /* text-blue-700 */
+}
+
+/* 버튼 텍스트 강화 */
+button {
+  color: inherit;
+}
+
+/* 카드 제목 텍스트 강화 */
+h1, h2, h3, h4, h5, h6 {
+  color: #111827 !important; /* text-gray-900 */
+}
