@@ -8,7 +8,9 @@ import Button from '@/components/ui/Button';
 import CompanyAccountList from '@/components/features/CompanyAccountList';
 import CompanyAccountForm from '@/components/features/CompanyAccountForm';
 import CompanyTransactionForm from '@/components/features/CompanyTransactionForm';
-import type { CompanyAccount, CompanyFinanceSummary, CompanyTransaction } from '@/types';
+import BudgetForm from '@/components/features/BudgetForm';
+import BudgetList from '@/components/features/BudgetList';
+import type { CompanyAccount, CompanyFinanceSummary, CompanyTransaction, Budget } from '@/types';
 import { formatCurrency, calculateGrowthRate, formatPercentage, formatDateKorean } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -17,16 +19,20 @@ export default function CompanyFinancePage() {
   const [accounts, setAccounts] = useState<CompanyAccount[]>([]);
   const [transactions, setTransactions] = useState<CompanyTransaction[]>([]);
   const [summary, setSummary] = useState<CompanyFinanceSummary | null>(null);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<CompanyAccount | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<CompanyTransaction | null>(null);
+  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
 
   useEffect(() => {
     fetchAccounts();
     fetchTransactions();
     fetchSummary();
+    fetchBudgets();
   }, [selectedMonth]);
 
   const fetchAccounts = async () => {
@@ -122,6 +128,51 @@ export default function CompanyFinancePage() {
     fetchTransactions();
     fetchAccounts();
     fetchSummary();
+  };
+
+  const fetchBudgets = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append('type', 'company');
+      if (selectedMonth) {
+        const [year, month] = selectedMonth.split('-');
+        params.append('year', year);
+        params.append('month', month);
+      }
+
+      const response = await fetch(`/api/budgets?${params.toString()}`);
+      const data = await response.json();
+      setBudgets(data);
+    } catch (error) {
+      console.error('Error fetching budgets:', error);
+    }
+  };
+
+  const handleCreateBudget = () => {
+    setEditingBudget(null);
+    setIsBudgetModalOpen(true);
+  };
+
+  const handleEditBudget = (budget: Budget) => {
+    setEditingBudget(budget);
+    setIsBudgetModalOpen(true);
+  };
+
+  const handleDeleteBudget = async (id: number) => {
+    if (!confirm('이 예산을 삭제하시겠습니까?')) return;
+
+    try {
+      await fetch(`/api/budgets/${id}`, { method: 'DELETE' });
+      fetchBudgets();
+    } catch (error) {
+      console.error('Error deleting budget:', error);
+    }
+  };
+
+  const handleBudgetFormSuccess = () => {
+    setIsBudgetModalOpen(false);
+    setEditingBudget(null);
+    fetchBudgets();
   };
 
   const incomeGrowth = summary?.prevMonthIncome
@@ -285,6 +336,21 @@ export default function CompanyFinancePage() {
             onDelete={handleDeleteAccount}
           />
         </div>
+
+        {/* 예산 관리 */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">예산 관리</h2>
+            <Button onClick={handleCreateBudget}>
+              + 새 예산
+            </Button>
+          </div>
+          <BudgetList
+            budgets={budgets}
+            onEdit={handleEditBudget}
+            onDelete={handleDeleteBudget}
+          />
+        </div>
       </div>
 
       {/* 계좌 생성/수정 모달 */}
@@ -334,6 +400,19 @@ export default function CompanyFinancePage() {
             </div>
           )}
         </>
+      )}
+
+      {/* 예산 생성/수정 모달 */}
+      {isBudgetModalOpen && (
+        <BudgetForm
+          budget={editingBudget}
+          type="company"
+          onClose={() => {
+            setIsBudgetModalOpen(false);
+            setEditingBudget(null);
+          }}
+          onSuccess={handleBudgetFormSuccess}
+        />
       )}
     </MainLayout>
   );
