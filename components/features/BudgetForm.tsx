@@ -72,11 +72,35 @@ export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetF
   };
 
   const personalCategories = [
-    '식비', '교통비', '의료비', '쇼핑', '여가', '교육', '통신비', '주거비', '기타'
+    '부모님 생활비',
+    '지연이 카드값',
+    '예현이 용돈',
+    '영주 용돈',
+    '중원이 용돈',
+    '차입금 변제',
+    '아파트 임대비',
+    '러시아 생활비',
+    '스베따 급여',
+    '식비',
+    '교통비',
+    '주거비',
+    '쇼핑',
+    '의료비',
+    '교육비',
+    '기타'
   ];
 
   const companyCategories = [
-    '인건비', '마케팅', '운영비', '장비구매', '임대료', '전기세', '인터넷비', '기타'
+    '인건비',
+    '사무실임대료',
+    '마케팅비용',
+    '개발비용',
+    '법무회계비용',
+    '여비교통비',
+    '통신비',
+    '접대비',
+    '서버 및 SaaS',
+    '기타지출'
   ];
 
   const categories = type === 'personal' ? personalCategories : companyCategories;
