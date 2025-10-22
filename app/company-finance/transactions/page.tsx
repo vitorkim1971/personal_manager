@@ -19,7 +19,7 @@ export default function CompanyTransactionsPage() {
   const [filter, setFilter] = useState({
     accountId: '',
     type: '',
-    month: format(new Date(), 'yyyy-MM'),
+    month: '', // 기본값을 빈 문자열로 변경하여 전체 거래 내역 표시
   });
 
   useEffect(() => {
@@ -128,6 +128,7 @@ export default function CompanyTransactionsPage() {
               className="px-3 py-2 border border-gray-300 rounded-lg"
               value={filter.month}
               onChange={(e) => setFilter({ ...filter, month: e.target.value })}
+              placeholder="전체 기간"
             />
 
             <select
@@ -152,8 +153,8 @@ export default function CompanyTransactionsPage() {
               <option value="transfer">이체</option>
             </select>
 
-            {(filter.accountId || filter.type) && (
-              <Button variant="ghost" onClick={() => setFilter({ ...filter, accountId: '', type: '' })}>
+            {(filter.accountId || filter.type || filter.month) && (
+              <Button variant="ghost" onClick={() => setFilter({ accountId: '', type: '', month: '' })}>
                 필터 초기화
               </Button>
             )}
