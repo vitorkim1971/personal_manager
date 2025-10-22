@@ -60,6 +60,18 @@ export async function PUT(
       updates.push('description = ?');
       values.push(body.description);
     }
+    if (body.exchange_name !== undefined) {
+      updates.push('exchange_name = ?');
+      values.push(body.exchange_name);
+    }
+    if (body.wallet_address !== undefined) {
+      updates.push('wallet_address = ?');
+      values.push(body.wallet_address);
+    }
+    if (body.network !== undefined) {
+      updates.push('network = ?');
+      values.push(body.network);
+    }
     if (body.is_active !== undefined) {
       updates.push('is_active = ?');
       values.push(body.is_active);

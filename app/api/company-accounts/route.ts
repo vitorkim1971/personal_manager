@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     const result = db.prepare(`
       INSERT INTO company_accounts (
         account_name, account_number, bank_name, account_type,
-        currency, balance, description, is_active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        currency, balance, description, exchange_name, wallet_address, network, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       body.account_name,
       body.account_number || null,
@@ -44,6 +44,9 @@ export async function POST(request: NextRequest) {
       body.currency || 'USD',
       body.balance || 0,
       body.description || null,
+      body.exchange_name || null,
+      body.wallet_address || null,
+      body.network || null,
       body.is_active !== undefined ? body.is_active : 1
     );
 

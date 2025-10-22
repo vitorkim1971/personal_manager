@@ -12,6 +12,7 @@ interface CompanyAccountListProps {
 }
 
 const accountTypeLabels: Record<string, string> = {
+  crypto: '암호화폐',
   checking: '당좌예금',
   savings: '보통예금',
   investment: '투자계좌',
@@ -44,11 +45,31 @@ export default function CompanyAccountList({ accounts, onEdit, onDelete }: Compa
               </span>
             </div>
 
-            {account.bank_name && (
-              <div className="text-sm text-gray-600">
-                {account.bank_name}
-                {account.account_number && ` • ${account.account_number}`}
+            {account.account_type === 'crypto' ? (
+              <div className="space-y-1">
+                {account.exchange_name && (
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium">거래소:</span> {account.exchange_name}
+                  </div>
+                )}
+                {account.wallet_address && (
+                  <div className="text-xs text-gray-500 truncate" title={account.wallet_address}>
+                    <span className="font-medium">주소:</span> {account.wallet_address}
+                  </div>
+                )}
+                {account.network && (
+                  <div className="text-xs text-gray-500">
+                    <span className="font-medium">네트워크:</span> {account.network}
+                  </div>
+                )}
               </div>
+            ) : (
+              account.bank_name && (
+                <div className="text-sm text-gray-600">
+                  {account.bank_name}
+                  {account.account_number && ` • ${account.account_number}`}
+                </div>
+              )
             )}
 
             <div className="pt-3 border-t border-gray-200">

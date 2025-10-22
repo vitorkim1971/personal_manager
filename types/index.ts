@@ -228,7 +228,7 @@ export interface TransactionFilter {
 }
 
 // Company Account (회사 계좌)
-export type AccountType = 'checking' | 'savings' | 'investment' | 'other';
+export type AccountType = 'checking' | 'savings' | 'investment' | 'crypto' | 'other';
 
 export interface CompanyAccount {
   id: number;
@@ -239,6 +239,9 @@ export interface CompanyAccount {
   currency: string;
   balance: number;
   description?: string;
+  exchange_name?: string;
+  wallet_address?: string;
+  network?: string;
   is_active: number;
   created_at: string;
   updated_at: string;
@@ -252,6 +255,9 @@ export interface CreateCompanyAccountInput {
   currency?: string;
   balance?: number;
   description?: string;
+  exchange_name?: string;
+  wallet_address?: string;
+  network?: string;
   is_active?: number;
 }
 
@@ -263,6 +269,9 @@ export interface UpdateCompanyAccountInput {
   currency?: string;
   balance?: number;
   description?: string;
+  exchange_name?: string;
+  wallet_address?: string;
+  network?: string;
   is_active?: number;
 }
 

@@ -18,10 +18,13 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
     account_name: '',
     account_number: '',
     bank_name: '',
-    account_type: 'checking',
-    currency: 'USD',
+    account_type: 'crypto',
+    currency: 'USDT',
     balance: 0,
     description: '',
+    exchange_name: '',
+    wallet_address: '',
+    network: '',
     is_active: 1,
   });
 
@@ -35,6 +38,9 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
         currency: account.currency,
         balance: account.balance,
         description: account.description,
+        exchange_name: account.exchange_name,
+        wallet_address: account.wallet_address,
+        network: account.network,
         is_active: account.is_active,
       });
     }
@@ -66,7 +72,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
       isOpen={true}
       onClose={onClose}
       title={account ? '계좌 수정' : '새 계좌 추가'}
-      size="md"
+      size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -75,20 +81,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
           value={formData.account_name}
           onChange={(e) => setFormData({ ...formData, account_name: e.target.value })}
           required
-        />
-
-        <Input
-          label="계좌번호"
-          type="text"
-          value={formData.account_number}
-          onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
-        />
-
-        <Input
-          label="은행명"
-          type="text"
-          value={formData.bank_name}
-          onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+          placeholder="예: Binance USDT 메인"
         />
 
         <Select
@@ -96,6 +89,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
           value={formData.account_type}
           onChange={(e) => setFormData({ ...formData, account_type: e.target.value as any })}
           options={[
+            { value: 'crypto', label: '암호화폐 계좌' },
             { value: 'checking', label: '당좌예금' },
             { value: 'savings', label: '보통예금' },
             { value: 'investment', label: '투자계좌' },
@@ -103,11 +97,56 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
           ]}
         />
 
+        {formData.account_type === 'crypto' ? (
+          <>
+            <Input
+              label="거래소/지갑명"
+              type="text"
+              value={formData.exchange_name}
+              onChange={(e) => setFormData({ ...formData, exchange_name: e.target.value })}
+              placeholder="예: Binance, MetaMask, Trust Wallet"
+            />
+
+            <Input
+              label="지갑 주소"
+              type="text"
+              value={formData.wallet_address}
+              onChange={(e) => setFormData({ ...formData, wallet_address: e.target.value })}
+              placeholder="입출금 주소"
+            />
+
+            <Input
+              label="네트워크"
+              type="text"
+              value={formData.network}
+              onChange={(e) => setFormData({ ...formData, network: e.target.value })}
+              placeholder="예: TRC20, ERC20, BEP20"
+            />
+          </>
+        ) : (
+          <>
+            <Input
+              label="계좌번호"
+              type="text"
+              value={formData.account_number}
+              onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+            />
+
+            <Input
+              label="은행명"
+              type="text"
+              value={formData.bank_name}
+              onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+            />
+          </>
+        )}
+
         <Input
           label="통화"
           type="text"
           value={formData.currency}
           onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+          placeholder="예: USDT, BTC, ETH, USD"
         />
 
         <Input
