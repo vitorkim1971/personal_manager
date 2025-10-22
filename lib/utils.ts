@@ -5,11 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-// 금액 포맷팅 (원화)
+// 금액 포맷팅 (달러)
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ko-KR', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'KRW',
+    currency: 'USD',
   }).format(amount);
 }
 
