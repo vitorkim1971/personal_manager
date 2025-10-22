@@ -11,6 +11,7 @@ import type {
 } from '@/types';
 import IncomeExpenseChart from '@/components/features/IncomeExpenseChart';
 import CategoryPieChart from '@/components/features/CategoryPieChart';
+import Calendar from '@/components/features/Calendar';
 
 export default function DashboardPage() {
   const [todayStats, setTodayStats] = useState<TodayTaskStats | null>(null);
@@ -435,6 +436,72 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <CategoryPieChart data={categoryStats} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 달력 섹션 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 업무 달력 */}
+          <div className="lg:col-span-2">
+            <Calendar 
+              tasks={recentTasks} 
+              onTaskClick={(task) => {
+                // 작업 클릭 시 업무관리 페이지로 이동
+                window.location.href = '/tasks';
+              }}
+            />
+          </div>
+
+          {/* 업무 요약 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">📋 업무관리 메뉴</div>
+                  이번 달 업무 요약
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">총 작업</span>
+                  <span className="font-semibold">{recentTasks.length}개</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">완료된 작업</span>
+                  <span className="font-semibold text-green-600">
+                    {recentTasks.filter(task => task.status === 'completed').length}개
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">진행중 작업</span>
+                  <span className="font-semibold text-blue-600">
+                    {recentTasks.filter(task => task.status === 'in_progress').length}개
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">지연된 작업</span>
+                  <span className="font-semibold text-red-600">
+                    {recentTasks.filter(task => 
+                      task.due_date && 
+                      new Date(task.due_date) < new Date() && 
+                      task.status !== 'completed'
+                    ).length}개
+                  </span>
+                </div>
+                <div className="pt-2 border-t">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => window.location.href = '/tasks'}
+                    className="w-full"
+                  >
+                    전체 업무 보기
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
