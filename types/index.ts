@@ -227,3 +227,98 @@ export interface TransactionFilter {
   project_id?: number;
 }
 
+// Company Account (회사 계좌)
+export type AccountType = 'checking' | 'savings' | 'investment' | 'other';
+
+export interface CompanyAccount {
+  id: number;
+  account_name: string;
+  account_number?: string;
+  bank_name?: string;
+  account_type: AccountType;
+  currency: string;
+  balance: number;
+  description?: string;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCompanyAccountInput {
+  account_name: string;
+  account_number?: string;
+  bank_name?: string;
+  account_type?: AccountType;
+  currency?: string;
+  balance?: number;
+  description?: string;
+  is_active?: number;
+}
+
+export interface UpdateCompanyAccountInput {
+  account_name?: string;
+  account_number?: string;
+  bank_name?: string;
+  account_type?: AccountType;
+  currency?: string;
+  balance?: number;
+  description?: string;
+  is_active?: number;
+}
+
+// Company Transaction (회사 거래)
+export type CompanyTransactionType = 'income' | 'expense' | 'transfer';
+
+export interface CompanyTransaction {
+  id: number;
+  account_id: number;
+  type: CompanyTransactionType;
+  amount: number;
+  category: string;
+  date: string;
+  description?: string;
+  payment_method?: string;
+  reference_number?: string;
+  project_id?: number;
+  vendor_customer?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCompanyTransactionInput {
+  account_id: number;
+  type: CompanyTransactionType;
+  amount: number;
+  category: string;
+  date: string;
+  description?: string;
+  payment_method?: string;
+  reference_number?: string;
+  project_id?: number;
+  vendor_customer?: string;
+}
+
+export interface UpdateCompanyTransactionInput {
+  account_id?: number;
+  type?: CompanyTransactionType;
+  amount?: number;
+  category?: string;
+  date?: string;
+  description?: string;
+  payment_method?: string;
+  reference_number?: string;
+  project_id?: number;
+  vendor_customer?: string;
+}
+
+// Company Finance Summary (회사 재무 요약)
+export interface CompanyFinanceSummary {
+  month: string;
+  totalIncome: number;
+  totalExpense: number;
+  netIncome: number;
+  accountBalances: { account_name: string; balance: number }[];
+  prevMonthIncome?: number;
+  prevMonthExpense?: number;
+}
+
