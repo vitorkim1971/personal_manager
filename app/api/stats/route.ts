@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
       return getMonthlyStats(request);
     } else if (type === 'yearly') {
       return getYearlyStats(request);
+    } else if (type === 'balance') {
+      return getCurrentBalance();
     } else if (type === 'trends') {
       return getTrendsData();
     } else if (type === 'categories') {
@@ -203,6 +205,33 @@ function getYearlyStats(request: NextRequest) {
     netIncome: incomeResult.total - expenseResult.total,
     prevYearIncome: prevIncomeResult.total,
     prevYearExpense: prevExpenseResult.total,
+  });
+}
+
+// 현재 잔액 계산 (총 수입 - 총 지출)
+function getCurrentBalance() {
+  // 총 수입
+  const incomeStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE type = 'income'
+  `);
+  const incomeResult = incomeStmt.get() as { total: number };
+
+  // 총 지출
+  const expenseStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM transactions
+    WHERE type = 'expense'
+  `);
+  const expenseResult = expenseStmt.get() as { total: number };
+
+  const currentBalance = incomeResult.total - expenseResult.total;
+
+  return NextResponse.json({
+    currentBalance,
+    totalIncome: incomeResult.total,
+    totalExpense: expenseResult.total,
   });
 }
 

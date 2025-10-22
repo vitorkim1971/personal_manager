@@ -9,6 +9,11 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type');
     const month = searchParams.get('month');
 
+    if (type === 'balance') {
+      // 현재 잔액 계산
+      return getCurrentBalance();
+    }
+
     if (type === 'monthly') {
       // 월별 요약
       const targetMonth = month || new Date().toISOString().slice(0, 7);
@@ -173,5 +178,32 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching company stats:', error);
     return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
+}
+
+// 현재 잔액 계산 (총 수입 - 총 지출)
+function getCurrentBalance() {
+  // 총 수입
+  const incomeStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM company_transactions
+    WHERE type = 'income'
+  `);
+  const incomeResult = incomeStmt.get() as { total: number };
+
+  // 총 지출
+  const expenseStmt = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM company_transactions
+    WHERE type = 'expense'
+  `);
+  const expenseResult = expenseStmt.get() as { total: number };
+
+  const currentBalance = incomeResult.total - expenseResult.total;
+
+  return NextResponse.json({
+    currentBalance,
+    totalIncome: incomeResult.total,
+    totalExpense: expenseResult.total,
+  });
 }
 
