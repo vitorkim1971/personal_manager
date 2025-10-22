@@ -15,7 +15,24 @@ interface TransactionFormProps {
 }
 
 const incomeCategories = ['타이탄', '아일라', '투자수익', '기타수익'];
-const expenseCategories = ['식비', '교통비', '주거비', '쇼핑', '의료비', '교육비', '기타'];
+const expenseCategories = [
+  '부모님 생활비',
+  '지연이 카드값',
+  '예현이 용돈',
+  '영주 용돈',
+  '중원이 용돈',
+  '차입금 변제',
+  '아파트 임대비',
+  '러시아 생활비',
+  '스베따 급여',
+  '식비',
+  '교통비',
+  '주거비',
+  '쇼핑',
+  '의료비',
+  '교육비',
+  '기타'
+];
 
 export default function TransactionForm({ transaction, onClose, onSuccess }: TransactionFormProps) {
   const [formData, setFormData] = useState<CreateTransactionInput>({
