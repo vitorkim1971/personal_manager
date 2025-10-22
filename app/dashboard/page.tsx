@@ -110,13 +110,27 @@ export default function DashboardPage() {
             <CardContent>
               {recentTasks.length > 0 ? (
                 <>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {recentTasks.filter(task => task.status === 'completed').length}/{recentTasks.length}
+                  <div className="grid grid-cols-3 gap-4 mb-3">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-gray-600">
+                        {recentTasks.filter(task => task.status === 'todo').length}
+                      </div>
+                      <div className="text-xs text-gray-500">할일</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-600">
+                        {recentTasks.filter(task => task.status === 'in_progress').length}
+                      </div>
+                      <div className="text-xs text-gray-500">진행중</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600">
+                        {recentTasks.filter(task => task.status === 'completed').length}
+                      </div>
+                      <div className="text-xs text-gray-500">완료</div>
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    완료 {recentTasks.filter(task => task.status === 'completed').length}개 · 진행중 {recentTasks.filter(task => task.status === 'in_progress').length}개
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">
+                  <div className="text-sm text-gray-500 text-center">
                     총 {recentTasks.length}개 작업
                   </div>
                 </>
