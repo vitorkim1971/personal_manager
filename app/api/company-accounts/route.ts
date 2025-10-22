@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: CreateCompanyAccountInput = await request.json();
+    console.log('Creating account with data:', body);
 
     const result = db.prepare(`
       INSERT INTO company_accounts (
@@ -57,7 +58,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(newAccount, { status: 201 });
   } catch (error) {
     console.error('Error creating company account:', error);
-    return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ 
+      error: 'Failed to create account',
+      message: errorMessage,
+      details: error 
+    }, { status: 500 });
   }
 }
 

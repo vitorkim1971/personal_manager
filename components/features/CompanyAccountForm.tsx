@@ -97,7 +97,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
 
         <Select
           label="계좌 유형"
-          value={formData.account_type}
+          value={formData.account_type || 'crypto'}
           onChange={(e) => setFormData({ ...formData, account_type: e.target.value as any })}
           options={[
             { value: 'crypto', label: '암호화폐 지갑' },
@@ -107,7 +107,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
 
         <Select
           label="계좌 용도"
-          value={formData.account_purpose}
+          value={formData.account_purpose || 'both'}
           onChange={(e) => setFormData({ ...formData, account_purpose: e.target.value as any })}
           options={[
             { value: 'both', label: '입출금 겸용' },
@@ -188,7 +188,7 @@ export default function CompanyAccountForm({ account, onClose, onSuccess }: Comp
 
         <Select
           label="상태"
-          value={formData.is_active ? '1' : '0'}
+          value={formData.is_active !== undefined ? (formData.is_active ? '1' : '0') : '1'}
           onChange={(e) => setFormData({ ...formData, is_active: parseInt(e.target.value) })}
           options={[
             { value: '1', label: '활성' },
