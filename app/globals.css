@@ -67,3 +67,13 @@ button {
 h1, h2, h3, h4, h5, h6 {
   color: #111827 !important; /* text-gray-900 */
 }
+
+/* 지출 금액 강제 빨간색 적용 */
+.text-red-600 {
+  color: #dc2626 !important; /* 강제 빨간색 */
+}
+
+/* 수입 금액 강제 초록색 적용 */
+.text-green-600 {
+  color: #16a34a !important; /* 강제 초록색 */
+}
