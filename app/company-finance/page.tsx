@@ -393,7 +393,7 @@ export default function CompanyFinancePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className={`text-lg font-bold ${getAmountColorClass(transaction.type === 'income' ? transaction.amount : -transaction.amount)}`}>
+                    <div className={`text-lg font-bold ${transaction.type === 'income' ? 'text-green-600' : transaction.type === 'expense' ? 'text-red-600' : 'text-blue-600'}`}>
                       {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
                       {formatCurrency(transaction.amount)}
                     </div>

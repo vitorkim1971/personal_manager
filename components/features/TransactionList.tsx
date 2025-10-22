@@ -65,7 +65,7 @@ export default function TransactionList({ transactions, onEdit, onDelete }: Tran
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {transaction.category}
                 </td>
-                <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${getAmountColorClass(transaction.type === 'income' ? transaction.amount : -transaction.amount)}`}>
+                <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                   {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
