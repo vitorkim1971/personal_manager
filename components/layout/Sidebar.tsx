@@ -84,7 +84,7 @@ export default function Sidebar() {
               )}
             >
               <Icon />
-              <span className="font-medium">{item.name}</span>
+              <span className="font-medium w-[120px]">{item.name}</span>
             </Link>
           );
         })}
