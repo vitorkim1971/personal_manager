@@ -87,7 +87,7 @@ export default function Sidebar() {
                 'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                 isActive
                   ? 'bg-[#4a6fa5] text-white'
-                  : 'text-gray-300 hover:bg-[#1a1f2e] hover:text-white'
+                  : 'text-gray-100 hover:bg-[#1a1f2e] hover:text-white'
               )}
             >
               <Icon />
@@ -104,8 +104,8 @@ export default function Sidebar() {
             <UserIcon />
           </div>
           <div>
-            <p className="text-sm font-medium">사용자</p>
-            <p className="text-xs text-gray-400">개인 계정</p>
+            <p className="text-sm font-medium text-gray-100">사용자</p>
+            <p className="text-xs text-gray-200">개인 계정</p>
           </div>
         </div>
       </div>
