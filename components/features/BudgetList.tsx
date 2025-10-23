@@ -51,7 +51,7 @@ export default function BudgetList({ budgets, onEdit, onDelete }: BudgetListProp
             <div className="space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900">{budget.category}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{budget.category || '기타'}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm text-gray-500">
                       {budget.year}년 {budget.month}월

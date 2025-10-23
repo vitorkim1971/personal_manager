@@ -5,7 +5,7 @@ import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import type { Budget, CreateBudgetInput } from '@/types';
+import type { Budget, CreateBudgetInput, ExpenseCategory } from '@/types';
 
 interface BudgetFormProps {
   budget?: Budget;
@@ -15,9 +15,15 @@ interface BudgetFormProps {
 }
 
 export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetFormProps) {
+  // 타입에 따라 기본 카테고리 설정
+  const getDefaultCategory = () => {
+    if (type === 'personal') return '기타';
+    return '기타지출'; // 회사는 '기타지출'
+  };
+
   const [formData, setFormData] = useState<CreateBudgetInput>({
     type: type,
-    category: '',
+    category: getDefaultCategory(),
     budgeted_amount: 0,
     spent_amount: 0,
     year: new Date().getFullYear(),
@@ -100,29 +106,30 @@ export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetF
     '통신비',
     '접대비',
     '서버 및 SaaS',
-    '기타지출'
+    '기타지출',
+    '기타'
   ];
 
   const categories = type === 'personal' ? personalCategories : companyCategories;
 
   const months = [
-    { value: 1, label: '1월' },
-    { value: 2, label: '2월' },
-    { value: 3, label: '3월' },
-    { value: 4, label: '4월' },
-    { value: 5, label: '5월' },
-    { value: 6, label: '6월' },
-    { value: 7, label: '7월' },
-    { value: 8, label: '8월' },
-    { value: 9, label: '9월' },
-    { value: 10, label: '10월' },
-    { value: 11, label: '11월' },
-    { value: 12, label: '12월' },
+    { value: '1', label: '1월' },
+    { value: '2', label: '2월' },
+    { value: '3', label: '3월' },
+    { value: '4', label: '4월' },
+    { value: '5', label: '5월' },
+    { value: '6', label: '6월' },
+    { value: '7', label: '7월' },
+    { value: '8', label: '8월' },
+    { value: '9', label: '9월' },
+    { value: '10', label: '10월' },
+    { value: '11', label: '11월' },
+    { value: '12', label: '12월' },
   ];
 
   const years = Array.from({ length: 5 }, (_, i) => {
     const year = new Date().getFullYear() - 2 + i;
-    return { value: year, label: `${year}년` };
+    return { value: year.toString(), label: `${year}년` };
   });
 
   return (
@@ -136,7 +143,7 @@ export default function BudgetForm({ budget, type, onClose, onSuccess }: BudgetF
         <Select
           label="카테고리"
           value={formData.category || ''}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value as ExpenseCategory })}
           options={categories.map(cat => ({ value: cat, label: cat }))}
           required
         />

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { db } from '@/lib/kv-db';
 import type { Budget, CreateBudgetInput, UpdateBudgetInput } from '@/types';
 
 // GET - 예산 목록 조회

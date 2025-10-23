@@ -126,28 +126,42 @@ export interface UpdateProjectInput {
 }
 
 // Budget (예산)
+export type BudgetType = 'personal' | 'company';
+
 export interface Budget {
   id: number;
+  type: BudgetType;
   category: ExpenseCategory;
-  amount: number;
+  budgeted_amount: number;
+  spent_amount: number;
   month: number; // 1-12
   year: number;
+  description?: string;
+  is_active: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface CreateBudgetInput {
+  type?: BudgetType;
   category: ExpenseCategory;
-  amount: number;
+  budgeted_amount: number;
+  spent_amount?: number;
   month: number;
   year: number;
+  description?: string;
+  is_active?: number;
 }
 
 export interface UpdateBudgetInput {
+  type?: BudgetType;
   category?: ExpenseCategory;
-  amount?: number;
+  budgeted_amount?: number;
+  spent_amount?: number;
   month?: number;
   year?: number;
+  description?: string;
+  is_active?: number;
 }
 
 // File (파일)
@@ -343,5 +357,80 @@ export interface CompanyFinanceSummary {
   prevYearIncome?: number;
   prevYearExpense?: number;
   monthlyData?: { month: string; income: number; expense: number }[];
+}
+
+// Daily Task (매일할일)
+export interface DailyTask {
+  id: number;
+  title: string;
+  description?: string;
+  category: string;
+  priority: Priority;
+  start_time?: string;
+  end_time?: string;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateDailyTaskInput {
+  title: string;
+  description?: string;
+  category?: string;
+  priority?: Priority;
+  start_time?: string;
+  end_time?: string;
+  is_active?: number;
+}
+
+export interface UpdateDailyTaskInput {
+  title?: string;
+  description?: string;
+  category?: string;
+  priority?: Priority;
+  start_time?: string;
+  end_time?: string;
+  is_active?: number;
+}
+
+// Daily Task Completion (매일 완료 기록)
+export interface DailyTaskCompletion {
+  id: number;
+  daily_task_id: number;
+  completion_date: string;
+  completed_at: string;
+  notes?: string;
+}
+
+export interface CreateDailyTaskCompletionInput {
+  daily_task_id: number;
+  completion_date: string;
+  notes?: string;
+}
+
+// Daily Task with Completion Status
+export interface DailyTaskWithStatus extends DailyTask {
+  is_completed_today: boolean;
+  completion_notes?: string;
+  streak_count: number; // 연속 완료 일수
+}
+
+// Memo (개인메모)
+export interface Memo {
+  id: number;
+  title: string;
+  content?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateMemoInput {
+  title: string;
+  content?: string;
+}
+
+export interface UpdateMemoInput {
+  title?: string;
+  content?: string;
 }
 

@@ -385,7 +385,7 @@ export default function FinancePage() {
       {/* 예산 생성/수정 모달 */}
       {isBudgetModalOpen && (
         <BudgetForm
-          budget={editingBudget}
+          budget={editingBudget || undefined}
           type="personal"
           onClose={() => {
             setIsBudgetModalOpen(false);

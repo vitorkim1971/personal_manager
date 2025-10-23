@@ -203,6 +203,73 @@ function initDB() {
     CREATE INDEX IF NOT EXISTS idx_company_transactions_project_id ON company_transactions(project_id);
   `);
 
+  // Daily Tasks 테이블 (매일할일)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS daily_tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      description TEXT,
+      category TEXT DEFAULT 'general',
+      priority TEXT CHECK(priority IN ('high', 'medium', 'low')) DEFAULT 'medium',
+      start_time TEXT,
+      end_time TEXT,
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // 기존 테이블에 시간 필드 추가 (이미 존재하는 경우 무시)
+  try {
+    db.exec(`ALTER TABLE daily_tasks ADD COLUMN start_time TEXT`);
+  } catch (error) {
+    // 컬럼이 이미 존재하는 경우 무시
+  }
+
+  try {
+    db.exec(`ALTER TABLE daily_tasks ADD COLUMN end_time TEXT`);
+  } catch (error) {
+    // 컬럼이 이미 존재하는 경우 무시
+  }
+
+  // Daily Task Completions 테이블 (매일 완료 기록)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS daily_task_completions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      daily_task_id INTEGER NOT NULL,
+      completion_date DATE NOT NULL,
+      completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      notes TEXT,
+      FOREIGN KEY (daily_task_id) REFERENCES daily_tasks(id) ON DELETE CASCADE,
+      UNIQUE(daily_task_id, completion_date)
+    )
+  `);
+
+  // Daily Tasks 인덱스
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_daily_tasks_category ON daily_tasks(category);
+    CREATE INDEX IF NOT EXISTS idx_daily_tasks_is_active ON daily_tasks(is_active);
+    CREATE INDEX IF NOT EXISTS idx_daily_task_completions_date ON daily_task_completions(completion_date);
+    CREATE INDEX IF NOT EXISTS idx_daily_task_completions_task_id ON daily_task_completions(daily_task_id);
+  `);
+
+  // Memos 테이블 (개인메모)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS memos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      content TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Memos 인덱스
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_memos_created_at ON memos(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_memos_updated_at ON memos(updated_at DESC);
+  `);
+
   console.log('Database initialized successfully');
 }
 

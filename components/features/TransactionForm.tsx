@@ -96,7 +96,7 @@ export default function TransactionForm({ transaction, onClose, onSuccess }: Tra
             setFormData({ 
               ...formData, 
               type: newType,
-              category: newType === 'income' ? '타이탄' : '식비'
+              category: newType === 'income' ? '기타' : '식비'
             });
           }}
           options={[

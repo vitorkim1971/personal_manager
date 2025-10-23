@@ -93,7 +93,7 @@ export default function Calendar({
     if (task.status === 'completed') return 'bg-green-100 text-green-800';
     if (task.status === 'in_progress') return 'bg-blue-100 text-blue-800';
     if (task.status === 'overdue') return 'bg-red-100 text-red-800';
-    if (isPast(new Date(task.due_date!)) && task.status !== 'completed') return 'bg-red-100 text-red-800';
+    if (isPast(new Date(task.due_date!)) && (task.status as string) !== 'completed') return 'bg-red-100 text-red-800';
     return 'bg-gray-100 text-gray-800';
   };
 

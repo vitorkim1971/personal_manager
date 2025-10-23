@@ -106,7 +106,7 @@ export function getPriorityLabel(priority: 'high' | 'medium' | 'low'): string {
 }
 
 // 상태 색상
-export function getStatusColor(status: 'todo' | 'in_progress' | 'completed'): string {
+export function getStatusColor(status: 'todo' | 'in_progress' | 'completed' | 'overdue'): string {
   switch (status) {
     case 'todo':
       return 'text-blue-600 bg-blue-50';
@@ -114,13 +114,15 @@ export function getStatusColor(status: 'todo' | 'in_progress' | 'completed'): st
       return 'text-purple-600 bg-purple-50';
     case 'completed':
       return 'text-green-600 bg-green-50';
+    case 'overdue':
+      return 'text-red-600 bg-red-50';
     default:
       return 'text-gray-600 bg-gray-50';
   }
 }
 
 // 상태 한글 이름
-export function getStatusLabel(status: 'todo' | 'in_progress' | 'completed'): string {
+export function getStatusLabel(status: 'todo' | 'in_progress' | 'completed' | 'overdue'): string {
   switch (status) {
     case 'todo':
       return '할 일';
@@ -128,6 +130,8 @@ export function getStatusLabel(status: 'todo' | 'in_progress' | 'completed'): st
       return '진행 중';
     case 'completed':
       return '완료';
+    case 'overdue':
+      return '지연';
     default:
       return '할 일';
   }
